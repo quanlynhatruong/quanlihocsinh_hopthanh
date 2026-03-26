@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    /* 1. NỀN TRANG & FONT CHỮ */
+    body { 
+      background-color: #fffbf0; 
+      font-family: 'Times New Roman', Times, serif; 
+      font-size: 15px; 
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: ""; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 85vh; height: 85vh;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Trong_dong_Ngoc_Lu.jpg/1024px-Trong_dong_Ngoc_Lu.jpg');
+      background-size: contain; background-position: center; background-repeat: no-repeat;
+      opacity: 0.4; z-index: -1;
+      filter: sepia(100%) saturate(500%) contrast(120%) brightness(90%); pointer-events: none;
+    }
+    .main-container {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 4px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin: 10px auto; padding: 15px; max-width: 99%;
+      border: 1px solid #d4af37;
+      position: relative;
+    }
+    h3, h4 { 
+      color: #b71c1c; font-weight: 900; text-transform: uppercase;
+      text-shadow: 1px 1px 0px #fff; margin-bottom: 15px;
+      border-bottom: 3px solid #b71c1c; display: inline-block; padding-bottom: 5px;
+    }
+    
+    /* --- CSS CHO THÔNG TIN NHÀ PHÁT TRIỂN --- */
+    .dev-badge {
+        position: absolute;
+        top: 8px; right: 15px; text-align: right; z-index: 1000;
+        background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.8));
+        padding-left: 20px; pointer-events: none;
+        font-family: 'Times New Roman', sans-serif;
+    }
+    .dev-name {
+        font-family: 'Arial', sans-serif;
+        font-weight: 900; color: #d63384; 
+        font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 0 #fff;
+    }
+    .dev-role { font-size: 11px; color: #555; font-style: italic; font-weight: 600; margin-top: -2px; }
+    .diamond-icon {
+        font-size: 24px; color: #0dcaf0; margin-left: 8px;
+        filter: drop-shadow(0 0 3px rgba(13, 202, 240, 0.6));
+        animation: sparkle 2s infinite ease-in-out; display: inline-block; vertical-align: middle;
+    }
+    @keyframes sparkle {
+        0% { transform: scale(1) rotate(0deg); filter: brightness(100%); }
+        50% { transform: scale(1.2) rotate(10deg); filter: brightness(150%); }
+        100% { transform: scale(1) rotate(0deg); filter: brightness(100%); }
+    }
+
+    /* 2. MENU TAB */
+    .nav-tabs { border-bottom: 2px solid #003366; padding-right: 200px; }
+    .nav-tabs .nav-link { color: #444; font-weight: 700; background: rgba(255,255,255,0.8); margin-right: 2px; }
+    .nav-tabs .nav-link.active { background-color: #003366; color: #ffffff !important; border-color: #003366; }
+    .nav-pills .nav-link.active { background-color: #b71c1c; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .nav-pills .nav-link { color: #333; background: #eceff1; font-weight: 700; border: 1px solid #999; margin-right: 5px; }
+
+    /* 3. CẤU HÌNH BẢNG */
+    .table-container { overflow-x: auto; max-height: 72vh; background: rgba(255,255,255,0.95); border: 1px solid #333; }
+    table { margin-bottom: 0 !important; border-collapse: collapse; border-spacing: 0; }
+    
+    table thead th { 
+      background-color: #e0e0e0; color: #000000; text-shadow: none;
+      text-align: center; vertical-align: middle; white-space: nowrap; 
+      border: 1px solid #999; position: sticky; top: 0; z-index: 10;
+      font-weight: 700; font-size: 14px; padding: 6px 4px !important;
+    }
+
+    #bang1 thead th:nth-child(-n+6), #bang1 thead th:nth-child(n+7):nth-child(-n+10),
+    #bang1 thead th:nth-child(n+11):nth-child(-n+16), #bang1 thead th:nth-child(n+17) { background-color: #e0e0e0 !important; color: #000 !important; }
+
+    /* Cập nhật CSS cho các bảng thống kê mới */
+    #bang3_1 thead th:not(.col-age), #bang3_1_thcs thead th:not(.col-age) { background-color: #e0e0e0 !important; color: #000 !important; }
+    #bang3_1 thead tr:nth-child(2) th, #bang3_1_thcs thead tr:nth-child(2) th { top: 34px; z-index: 10; background-color: #e0e0e0 !important; color: #000 !important; border: 1px solid #999; }
+    
+    #bang2 thead th:first-child, #bang2 thead th:nth-child(2), #bang2 thead th:nth-child(3), #bang2 thead th:nth-child(4), #bang2 thead th:nth-child(5) { background-color: #e0e0e0 !important; color: #000 !important; }
+    
+    /* CSS RIÊNG CHO CỘT HKI */
+    .th-hk1 { background-color: #d1ecf1 !important; color: #000 !important; }
+    
+    th.th-ket-qua, th.th-cap-xa, th.th-cap-huyen, th.th-cap-tinh, th.th-cap-qg, th.th-cap-qt { background-color: #e0e0e0 !important; color: #000 !important; }
+    th.th-cap-tinh { text-shadow: none !important; }
+    
+    table:not(#bang3_1):not(#bang3_1_thcs) thead tr:nth-child(2) th { top: 34px; z-index: 10; background-color: #e0e0e0 !important; color: #000 !important; }
+    table:not(#bang3_1):not(#bang3_1_thcs) thead tr:nth-child(2) th:nth-child(n+13):nth-child(-n+16) { background-color: #e0e0e0 !important; color: #000 !important; }
+
+    td { white-space: nowrap; vertical-align: middle; padding: 0px !important; border: 1px solid #888 !important; font-size: 15px; height: 30px; color: #000; }
+    
+    .table-striped > tbody > tr:nth-of-type(odd) > * { --bs-table-accent-bg: transparent; color: #000; }
+    .table-striped > tbody > tr:nth-of-type(even) > * { --bs-table-accent-bg: rgba(0, 0, 0, 0.04); color: #000; }
+    
+    tbody tr:hover > * {
+        background-color: #ffeb3b !important; 
+        color: #000000 !important; 
+        --bs-table-accent-bg: #ffeb3b !important;
+        box-shadow: inset 0 0 0 9999px #ffeb3b !important; 
+    }
+    tbody tr:hover input,
+    tbody tr:hover select {
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important; 
+        font-weight: bold !important;
+        background-color: transparent !important;     
+    }
+    tbody tr:hover i.bi { color: #b71c1c !important; }
+    tbody tr:hover input[type="checkbox"] { border: 2px solid #000000 !important; }
+
+    tr.row-total > td { background-color: #cce5ff !important; color: #b71c1c !important; font-weight: 900 !important; }
+    tr.row-grade-total > td { background-color: #e6f7ff !important; color: #003366 !important; font-weight: 700 !important; font-style: italic; }
+
+    .col-compact { min-width: 35px; max-width: 45px; text-align: center; padding: 0px !important; }
+    .zero-val { opacity: 0; } .has-val { font-weight: 700; color: #000; }
+    
+    input.cell-input, select.cell-input { border: none; width: 100%; height: 100%; padding: 4px 5px; background: transparent; font-family: 'Times New Roman'; font-size: 15px; outline: none; }
+    input.cell-input:focus { background: #fff; box-shadow: inset 0 0 0 2px #003366; }
+    
+    input:disabled, select:disabled { color: #000 !important; background: transparent; cursor: default; opacity: 1 !important; -webkit-text-fill-color: #000; }
+    input[type="checkbox"]:disabled { opacity: 1 !important; filter: none !important; cursor: not-allowed; border: 2px solid #666 !important; background-color: #fff !important; width: 16px; height: 16px; appearance: none; -webkit-appearance: none; display: inline-block; position: relative; vertical-align: middle; border-radius: 3px; }
+    input[type="checkbox"]:checked:disabled { background-color: #003366 !important; border-color: #003366 !important; opacity: 1 !important; }
+    input[type="checkbox"]:checked:disabled::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+    .filter-box { background: rgba(255,255,255,0.9); border: 1px solid #aaa; border-left: 5px solid #b71c1c; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
+    label { font-weight: 700; color: #003366; font-size: 13px; margin-bottom: 2px; display: block;}
+    .edit-mode-btn { display: none; }
+
+    /* --- GIAO DIỆN ĐĂNG NHẬP CHUẨN --- */
+    #login-overlay { 
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+      background: #f0fdf4; z-index: 999999; 
+      display: flex; flex-direction: column; justify-content: center; align-items: center; 
+      font-family: "Times New Roman", serif; 
+    }
+    .login-box { 
+      background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 12px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #0d6efd; 
+      max-width: 550px; width: 90%;
+    }
+    .login-logo { width: 80px; height: 80px; margin-bottom: 10px; }
+
+    /* Hiệu ứng chuyển cảnh mượt cho main-app */
+    #main-app { opacity: 0; transition: opacity 0.5s ease; }
+    
+    /* Giao diện Loading mượt giống Sổ kiểm tra */
+    #instant-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 2147483647; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .spinner-ring { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #dc3545; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px; }
+    .loader-text { font-family: 'Times New Roman', serif; font-weight: bold; color: #dc3545; letter-spacing: 1px; font-size: 14px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div id="instant-loader" style="display: none;">
+  <div class="spinner-ring"></div>
+  <div class="loader-text">ĐANG KẾT NỐI HỆ THỐNG...</div>
+</div>
+
+<div class="modal fade" id="trialModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" style="z-index: 9999999;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-4 border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.95);">
+      <div class="mb-4 mt-2">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" width="120">
+      </div>
+      <h5 class="fw-bold mb-3" style="font-family: 'Segoe UI', sans-serif;" id="trialTitle">Thông báo dùng thử</h5>
+      <p class="fs-5 text-secondary" style="font-family: 'Segoe UI', sans-serif;" id="trialMessage">
+        Bạn đang trong thời gian dùng thử 14 ngày. Ngày bắt đầu: 07/02/2026.
+      </p>
+      <button type="button" id="btnTrialOk" class="btn btn-primary px-5 mt-3 fw-bold" data-bs-dismiss="modal">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<div id="login-overlay" style="display:none;">
+  <div class="login-box">
+    <img src="https://i.ibb.co/SXSKh9xM/Logo-m-i-c-a-tr-ng-H-p-Th-Nh.png" class="login-logo" alt="Logo">
+    <h2 style="color: #b91c1c; margin-top: 0; font-family: 'Times New Roman', serif; font-size: 28px; text-transform: uppercase;">Quản Lý Học Sinh</h2>
+    <h3 style="color: #1e3a8a; margin-bottom: 25px; border-bottom: none; font-family: 'Times New Roman', serif; font-size: 24px; text-transform: none;">Trường TH&THCS Hợp Thành</h3>
+    
+    <div style="margin-bottom: 25px; padding: 15px 20px; background-color: #d1e7dd; border-radius: 8px; border: 1px solid #badbcc; text-align: left; color: #0f5132; line-height: 1.6; font-size: 16px;">
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="flex-shrink: 0; margin-top: 2px;">
+                <path d="M5.338 1.59a61 61 0 0 0-2.837.856.48.48 0 0 0-.328.39c-.554 4.157.826 7.11 2.536 8.951a10.7 10.7 0 0 0 3.328 2.15c.14.072.296.072.432 0 1.21-.62 2.25-1.47 3.328-2.15 1.71-1.84 3.09-4.794 2.536-8.95a.48.48 0 0 0-.328-.39c-.96-.289-1.92-.58-2.837-.856C9.53 1.15 8.35 1 8 1s-1.53.15-2.662.59zM8 2.016a1 1 0 0 0-.256.033 62 62 0 0 0-2.766.837c-.496.16-.992.32-1.488.484a.24.24 0 0 0-.164.195c-.443 3.332.222 5.86 1.637 7.394a10.4 10.4 0 0 0 2.916 1.956c.1.05.215.05.314 0a10.4 10.4 0 0 0 2.916-1.956c1.415-1.534 2.08-4.062 1.637-7.394a.24.24 0 0 0-.164-.195c-.496-.164-.992-.324-1.488-.484a62 62 0 0 0-2.766-.837A1 1 0 0 0 8 2.016"/>
+                <path d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+            </svg>
+            <span><b>Cam kết bảo mật:</b> Hệ thống sử dụng token an toàn của Google.<br>Tuyệt đối không thu thập hay lưu trữ thông tin cá nhân hoặc mã bảo mật của Thầy/Cô.</span>
+        </div>
+    </div>
+
+    <div style="font-size: 16px; color:#b91c1c; font-weight: bold; margin-bottom: 15px;">Phiên bản: V2.5.2026</div>
+
+    <div id="g_id_onload"
+         data-client_id="407480994586-m6fpq6sfcc90qqj9k08rsmi1lge6br94.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+
+    <div class="d-flex justify-content-center w-100 mt-2 mb-3">
+       <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
+    </div>
+    
+    <div style="margin-top: 30px; font-size: 15px; color: #888; font-weight: bold; text-align: center;">Phát triển bởi: HOÀNG NGỌC LÂM</div>
+  </div>
+</div>
+
+<div id="main-app" style="display:none;">
+
+  <div class="d-flex justify-content-between align-items-center mb-2 px-3 py-2" style="background: rgba(255,255,255,0.9); border-radius: 4px; border: 1px solid #d4af37; max-width: 99%; margin: 10px auto 0 auto;">
+    <div class="d-flex align-items-center">
+       <span class="me-2 small fw-bold">Xin chào:</span> 
+       <span id="profile-display" class="fw-bold text-primary me-3 small"></span> 
+       <span id="role-badge" class="badge bg-danger" style="font-size: 0.75rem;"></span>
+    </div>
+    <div>
+      <button onclick="logout()" class="btn btn-sm btn-outline-danger" style="font-size: 0.75rem; padding: 2px 10px; font-weight: bold;">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="container-fluid main-container">
+    
+    <div class="dev-badge d-flex align-items-center">
+        <div class="me-1">
+            <div class="dev-name">Hoàng Ngọc Lâm</div>
+            <div class="dev-role">Thiết kế và phát triển</div>
+        </div>
+        <i class="bi bi-gem diamond-icon"></i>
+    </div>
+
+    <ul class="nav nav-tabs mb-3" id="bangDieuKhien" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab1" type="button" onclick="HS_resetEditMode(1)"><i class="bi bi-person-vcard"></i> 1. Thông hiện học sinh</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab2" type="button" onclick="HS_resetEditMode(2)"><i class="bi bi-journal-check"></i> 2. Kết quả học tập & Thành tích</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab3" type="button"><i class="bi bi-bar-chart-line-fill"></i> 3. Thống kê - Tổng hợp</button></li>
+    </ul>
+
+    <div class="tab-content">
+      
+      <div class="tab-pane fade show active" id="tab1">
+        <div class="text-center"><h4>QUẢN LÝ THÔNG TIN HỌC SINH</h4></div>
+        
+        <div class="filter-box">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-1"><label>Năm học</label><select id="t1_nam" class="form-select form-select-sm fw-bold text-primary"></select></div>
+            <div class="col-md-1"><label>Lớp</label><select id="t1_lop" class="form-select form-select-sm fw-bold text-primary"></select></div>
+            <div class="col-md-2"><label>CCCD</label><input id="t1_cccd" class="form-control form-control-sm" placeholder="Nhập..."></div>
+            <div class="col-md-2"><label>Họ đệm</label><input id="t1_hodem" class="form-control form-control-sm"></div>
+            <div class="col-md-2"><label>Tên</label><input id="t1_ten" class="form-control form-control-sm"></div>
+            
+            <div class="col-md-4 text-end">
+              <button class="btn btn-sm btn-warning fw-bold px-3 me-1" id="btnEdit1" onclick="HS_batCheDoSua(1)" style="display:none"><i class="bi bi-pencil-square"></i> Sửa</button>
+              <button class="btn btn-sm btn-primary px-3 me-1" onclick="HS_taiTab1()"><i class="bi bi-search"></i> Tìm</button>
+              <span id="groupEdit1" class="edit-mode-btn">
+                <button class="btn btn-sm btn-success px-3 me-1" onclick="HS_luuTab1()"><i class="bi bi-hdd-fill"></i> Cập nhật</button>
+                <button class="btn btn-sm btn-secondary px-3" onclick="HS_themDongTab1()"><i class="bi bi-plus-lg"></i> Thêm</button>
+                <button class="btn btn-sm btn-info px-3 me-1" id="btnChuyenLop" onclick="HS_chuyenLop()" style="display:none"><i class="bi bi-arrow-left-right"></i> Chuyển lớp</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table table-bordered table-striped table-hover table-sm mb-0" id="bang1">
+            <thead>
+              <tr>
+                <th style="min-width:50px; width:50px;">#</th>
+                <th style="min-width:100px">Năm học</th><th style="min-width:60px">Lớp</th><th style="min-width:110px">CCCD</th>
+                <th style="min-width:110px">Họ đệm</th><th style="min-width:60px">Tên</th>
+                <th style="min-width:100px">Ngày sinh</th><th style="min-width:60px">Nam/nữ</th><th style="min-width:95px">Nơi ở (Thôn)</th><th style="min-width:200px">Thường trú (Xã/tỉnh)</th>
+                <th style="min-width:80px">Dân tộc</th><th style="min-width:80px">C.Sách</th><th style="min-width:80px">K.Tật</th><th style="min-width:60px">Nghèo</th><th style="min-width:60px">Cận N</th><th style="min-width:60px">BHYT</th>
+                <th style="min-width:130px">Tên Bố</th><th style="min-width:130px">Tên Mẹ</th><th style="min-width:100px">SĐT</th><th style="min-width:50px">Khẩu nơi khác</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab2">
+        <div class="text-center"><h4>KẾT QUẢ HỌC TẬP VÀ THÀNH TÍCH</h4></div>
+        <div class="filter-box">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-2"><label>Năm học</label><select id="t2_nam" class="form-select form-select-sm fw-bold text-primary"></select></div>
+            <div class="col-md-1"><label>Lớp</label><select id="t2_lop" class="form-select form-select-sm fw-bold text-primary"></select></div>
+            <div class="col-md-2"><label>CCCD</label><input id="t2_cccd" class="form-control form-control-sm"></div>
+            <div class="col-md-2"><label>Họ đệm</label><input id="t2_hodem" class="form-control form-control-sm"></div>
+            <div class="col-md-2"><label>Tên</label><input id="t2_ten" class="form-control form-control-sm"></div>
+            
+            <div class="col-md-3 text-end">
+              <button class="btn btn-sm btn-warning fw-bold px-3 me-1" id="btnEdit2" onclick="HS_batCheDoSua(2)" style="display:none"><i class="bi bi-pencil-square"></i> Sửa</button>
+              <button class="btn btn-sm btn-primary px-3 me-1" onclick="HS_taiTab2()"><i class="bi bi-search"></i> Tìm</button>
+              <span id="groupEdit2" class="edit-mode-btn">
+                <button class="btn btn-sm btn-success px-3" onclick="HS_luuTab2()"><i class="bi bi-check2-circle"></i> Cập nhật</button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table table-bordered table-striped table-hover table-sm mb-0" id="bang2">
+            <thead>
+              <tr>
+                <th rowspan="2" style="min-width:110px">CCCD</th><th rowspan="2" style="min-width:110px">Họ đệm</th>
+                <th rowspan="2" style="min-width:60px">Tên</th><th rowspan="2" style="min-width:90px">Ngày sinh</th>
+                <th rowspan="2" style="min-width:50px">GT</th>
+                
+                <th colspan="4" class="th-hk1">Kết quả Học Kỳ I</th>
+                <th colspan="4" class="th-ket-qua">Kết quả cuối năm</th>
+                
+                <th colspan="4" class="th-cap-xa">Giải Cấp Xã</th>
+                <th colspan="4" class="th-cap-huyen">Giải Huyện/Khu vực</th>
+                <th colspan="4" class="th-cap-tinh">Giải Cấp Tỉnh</th>
+                <th colspan="4" class="th-cap-qg">Giải Quốc Gia</th>
+                <th colspan="4" class="th-cap-qt">Giải Quốc Tế</th>
+              </tr>
+              <tr>
+                <th>XS</th><th>HTT</th><th>HT</th><th>CHT</th>
+                <th>XS</th><th>HTT</th><th>HT</th><th>CHT</th>
+                
+                <th>Nhất</th><th>Nhì</th><th>Ba</th><th>KK</th>
+                <th>Nhất</th><th>Nhì</th><th>Ba</th><th>KK</th>
+                <th>Nhất</th><th>Nhì</th><th>Ba</th><th>KK</th>
+                <th>Nhất</th><th>Nhì</th><th>Ba</th><th>KK</th>
+                <th>Nhất</th><th>Nhì</th><th>Ba</th><th>KK</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab3">
+        <div class="filter-box d-flex align-items-end gap-3" style="padding: 5px 10px; margin-bottom: 5px; margin-top: -10px;">
+          <div style="width: 200px">
+            <label class="mb-1">Chọn năm học:</label>
+            <select id="t3_nam" class="form-select form-select-sm fw-bold text-danger"></select>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-warning fw-bold text-dark shadow-sm" onclick="HS_taiThongKe()">📊 XEM BÁO CÁO</button>
+          </div>
+        </div>
+
+        <ul class="nav nav-pills mb-2" id="tabThongKe">
+          <li class="nav-item"><button class="nav-link active btn-sm" data-bs-toggle="pill" data-bs-target="#tk_soluong_th">1. Số lượng cấp tiểu học</button></li>
+          <li class="nav-item"><button class="nav-link btn-sm ms-2" data-bs-toggle="pill" data-bs-target="#tk_soluong_thcs">2. Số lượng học sinh THCS</button></li>
+          <li class="nav-item"><button class="nav-link btn-sm ms-2" data-bs-toggle="pill" data-bs-target="#tk_chatluong">3. Chất lượng và thành tích</button></li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="tk_soluong_th">
+            <div class="table-container">
+              <table class="table table-bordered table-striped table-sm text-center mb-0" id="bang3_1">
+                <thead>
+                  <tr>
+                    <th rowspan="2" style="width:40px">STT</th><th rowspan="2" style="min-width:80px">Lớp</th>
+                    <th rowspan="2" class="col-compact">TS</th>
+                    <th rowspan="2" class="col-compact">DT</th><th rowspan="2" class="col-compact">Nữ</th>
+                    <th rowspan="2" class="col-compact">Nữ DT</th><th rowspan="2" class="col-compact">K.Tật</th><th rowspan="2" class="col-compact">Nữ KT</th>
+                    <th rowspan="2" class="col-compact">Nghèo</th><th rowspan="2" class="col-compact">Cận N</th><th rowspan="2" class="col-compact">C.Sách</th><th rowspan="2" class="col-compact">BHYT</th>
+                    <th colspan="2" class="col-age">6 tuổi</th><th colspan="2" class="col-age">7 tuổi</th><th colspan="2" class="col-age">8 tuổi</th>
+                    <th colspan="2" class="col-age">9 tuổi</th><th colspan="2" class="col-age">10 tuổi</th><th colspan="2" class="col-age">11 tuổi</th>
+                    <th colspan="2" class="col-age">12 tuổi</th><th colspan="2" class="col-age">13 tuổi</th><th colspan="2" class="col-age">14 tuổi</th>
+                  </tr>
+                  <tr>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-pane fade" id="tk_soluong_thcs">
+            <div class="table-container">
+              <table class="table table-bordered table-striped table-sm text-center mb-0" id="bang3_1_thcs">
+                <thead>
+                  <tr>
+                    <th rowspan="2" style="width:40px">STT</th><th rowspan="2" style="min-width:80px">Lớp</th>
+                    <th rowspan="2" class="col-compact">TS</th>
+                    <th rowspan="2" class="col-compact">DT</th><th rowspan="2" class="col-compact">Nữ</th>
+                    <th rowspan="2" class="col-compact">Nữ DT</th><th rowspan="2" class="col-compact">K.Tật</th><th rowspan="2" class="col-compact">Nữ KT</th>
+                    <th rowspan="2" class="col-compact">Nghèo</th><th rowspan="2" class="col-compact">Cận N</th><th rowspan="2" class="col-compact">C.Sách</th><th rowspan="2" class="col-compact">BHYT</th>
+                    <th colspan="2" class="col-age">11 tuổi</th><th colspan="2" class="col-age">12 tuổi</th><th colspan="2" class="col-age">13 tuổi</th>
+                    <th colspan="2" class="col-age">14 tuổi</th><th colspan="2" class="col-age">15 tuổi</th><th colspan="2" class="col-age">16 tuổi</th>
+                    <th colspan="2" class="col-age">17 tuổi</th><th colspan="2" class="col-age">18 tuổi</th><th colspan="2" class="col-age">19 tuổi</th>
+                  </tr>
+                  <tr>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                    <th class="col-compact" style="font-size:11px">TS</th><th class="col-compact" style="font-size:11px">Nữ</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="tk_chatluong">
+            <div class="table-container">
+              <table class="table table-bordered table-striped table-sm text-center mb-0" id="bang3_2">
+                <thead>
+                  <tr>
+                    <th rowspan="2" style="width:40px">STT</th><th rowspan="2" style="min-width:80px">Lớp</th>
+                    <th rowspan="2" class="col-compact">TS</th>
+                    <th colspan="4" class="th-ket-qua">Kết quả học tập</th>
+                    <th colspan="4" class="th-cap-xa">Giải Cấp Xã</th>
+                    <th colspan="4" class="th-cap-huyen">Giải Huyện/Khu vực</th>
+                    <th colspan="4" class="th-cap-tinh">Giải Cấp Tỉnh</th>
+                    <th colspan="4" class="th-cap-qg">Giải Quốc Gia</th>
+                    <th colspan="4" class="th-cap-qt">Giải Quốc Tế</th>
+                  </tr>
+                  <tr>
+                    <th class="col-compact">XS</th><th class="col-compact">HTT</th><th class="col-compact">HT</th><th class="col-compact">CHT</th>
+                    <th class="col-compact">Nhất</th><th class="col-compact">Nhì</th><th class="col-compact">Ba</th><th class="col-compact">KK</th>
+                    <th class="col-compact">Nhất</th><th class="col-compact">Nhì</th><th class="col-compact">Ba</th><th class="col-compact">KK</th>
+                    <th class="col-compact">Nhất</th><th class="col-compact">Nhì</th><th class="col-compact">Ba</th><th class="col-compact">KK</th>
+                    <th class="col-compact">Nhất</th><th class="col-compact">Nhì</th><th class="col-compact">Ba</th><th class="col-compact">KK</th>
+                    <th class="col-compact">Nhất</th><th class="col-compact">Nhì</th><th class="col-compact">Ba</th><th class="col-compact">KK</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="ketnoi.js"></script>
+
+<script>
+  let HS_CAU_HINH = {};
+  let HS_IS_EDIT_MODE_1 = false;
+  let HS_IS_EDIT_MODE_2 = false;
+  let currentProfile = null;
+
+  // --- HÀM BẬT/TẮT MÀN HÌNH CHỜ (Tối ưu hóa hiển thị) ---
+  function HS_batLoading(trangThai) { 
+      document.getElementById('instant-loader').style.display = trangThai ? 'flex' : 'none'; 
+  }
+
+  // --- XỬ LÝ ĐĂNG NHẬP GOOGLE SIGN-IN ---
+  function decodeJwtResponse(token) {
+      let base64Url = token.split('.')[1];
+      let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+  }
+
+  function handleCredentialResponse(response) {
+      if (!checkTrialPeriod()) return;
+
+      const payload = decodeJwtResponse(response.credential);
+      const kAttr = "em" + "ail";
+      const sysId = payload[kAttr];
+
+      HS_batLoading(true);
+      
+      callServer('HS_xacThucVaLayCauHinh', {reqId: sysId, reqToken: ""}).then(res => {
+          if(!res.success) { 
+              HS_batLoading(false); 
+              Swal.fire("Lỗi truy cập", res.message, "error"); 
+              return; 
+          }
+          
+          currentProfile = res.data;
+          sessionStorage.setItem("sys_session_hs", JSON.stringify(currentProfile));
+          
+          HS_CAU_HINH = res.config;
+          HS_dienDuLieuSelect();
+          HS_ganSuKienLoc();
+
+          document.getElementById('profile-display').innerText = currentProfile.name; 
+          document.getElementById('role-badge').innerText = currentProfile.role === 'admin' ? 'Super Admin' : 'Giáo viên';
+          document.getElementById('login-overlay').style.display = 'none'; 
+          
+          HS_batLoading(false);
+          
+          let mainApp = document.getElementById('main-app');
+          mainApp.style.display = 'block';
+          setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+
+      }).catch(e => { Swal.fire("Lỗi", "Lỗi kết nối: " + e.message, "error"); HS_batLoading(false); });
+  }
+
+  function checkTrialPeriod() {
+    return true; // <--- CHỈ CẦN THÊM DÒNG NÀY ĐỂ TẠM TẮT TÍNH NĂNG
+    const trialStartDate = new Date(2026, 1, 7); 
+    const trialDays = 14;
+    const trialExpiryDate = new Date(trialStartDate);
+    trialExpiryDate.setDate(trialStartDate.getDate() + trialDays);
+    const today = new Date();
+
+    const trialModalElement = document.getElementById('trialModal');
+    const btnTrialOk = document.getElementById('btnTrialOk');
+    const trialMessage = document.getElementById('trialMessage');
+    const trialTitle = document.getElementById('trialTitle');
+
+    if (!trialModalElement || !btnTrialOk) return true;
+
+    if (today > trialExpiryDate) {
+      trialTitle.innerText = "Hết hạn dùng thử";
+      trialTitle.style.color = "#dc3545";
+      trialMessage.innerHTML = "Thời gian dùng thử 14 ngày của bạn đã kết thúc.<br>Vui lòng liên hệ Admin để gia hạn phần mềm.";
+      
+      btnTrialOk.innerText = 'Thoát hệ thống';
+      btnTrialOk.classList.remove('btn-primary');
+      btnTrialOk.classList.add('btn-danger');
+      btnTrialOk.removeAttribute('data-bs-dismiss'); 
+      
+      btnTrialOk.onclick = function() { window.location.href = "https://www.google.com"; };
+      
+      const trialModal = new bootstrap.Modal(trialModalElement, { backdrop: 'static', keyboard: false });
+      trialModal.show();
+      
+      let loginOverlay = document.getElementById('login-overlay'); if (loginOverlay) loginOverlay.style.display = 'none';
+      let mainApp = document.getElementById('main-app'); if (mainApp) mainApp.style.display = 'none';
+      let devBadge = document.querySelector('.dev-badge-container'); if (devBadge) devBadge.style.display = 'none';
+      
+      return false;
+    }
+
+    const trialModal = new bootstrap.Modal(trialModalElement, { backdrop: 'static', keyboard: false });
+    trialModal.show();
+    return true;
+  }
+
+  $(document).ready(function() {
+    const isTrialValid = checkTrialPeriod();
+    if (!isTrialValid) return; 
+
+    let savedSession = sessionStorage.getItem("sys_session_hs");
+    if(savedSession) {
+        currentProfile = JSON.parse(savedSession);
+        document.getElementById('login-overlay').style.display = 'none';
+        
+        HS_batLoading(true);
+        document.getElementById('profile-display').innerText = currentProfile.name;
+        document.getElementById('role-badge').innerText = currentProfile.role === 'admin' ? 'Super Admin' : 'Giáo viên';
+        
+        HS_ganSuKienLoc();
+        
+        callServer('HS_layDuLieuCauHinh', {sysAuth: currentProfile.reqId}).then(dulieu => {
+            HS_CAU_HINH = dulieu;
+            HS_dienDuLieuSelect();
+            
+            HS_batLoading(false);
+            
+            let mainApp = document.getElementById('main-app');
+            mainApp.style.display = 'block';
+            setTimeout(() => { mainApp.style.opacity = '1'; }, 50);
+            
+        }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+    } else {
+        HS_batLoading(false);
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+  });
+
+  function logout() { 
+       currentProfile = null; HS_CAU_HINH = {};
+       sessionStorage.removeItem("sys_session_hs");
+       location.reload(); 
+  }
+
+  function HS_dienDuLieuSelect() {
+    ['t1_nam','t1_lop','t2_nam','t2_lop','t3_nam'].forEach(id => {
+      let el = document.getElementById(id);
+      el.innerHTML = '<option value="">--</option>';
+      let loai = id.includes('nam') ? 'namHoc' : 'lop';
+      HS_CAU_HINH[loai].forEach(val => { let opt = document.createElement('option'); opt.value = val; opt.text = val; el.add(opt); });
+    });
+  }
+
+  function HS_ganSuKienLoc() {
+    const inputs1 = ['t1_nam', 't1_lop', 't1_cccd', 't1_hodem', 't1_ten'];
+    inputs1.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => HS_xoaBangVaNut(1));
+      el.addEventListener('change', () => HS_xoaBangVaNut(1));
+      if(el.tagName === 'INPUT') { el.addEventListener('keydown', (e) => { if(e.key === 'Enter') HS_taiTab1(); }); }
+    });
+
+    const inputs2 = ['t2_nam', 't2_lop', 't2_cccd', 't2_hodem', 't2_ten'];
+    inputs2.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => HS_xoaBangVaNut(2));
+      el.addEventListener('change', () => HS_xoaBangVaNut(2));
+      if(el.tagName === 'INPUT') { el.addEventListener('keydown', (e) => { if(e.key === 'Enter') HS_taiTab2(); }); }
+    });
+  }
+
+  function HS_xoaBangVaNut(tabIdx) {
+      const tbody = document.querySelector(`#bang${tabIdx} tbody`); tbody.innerHTML = '';
+      document.getElementById(`btnEdit${tabIdx}`).style.display = 'none';
+      document.getElementById(`groupEdit${tabIdx}`).style.display = 'none';
+      if(tabIdx === 1) HS_IS_EDIT_MODE_1 = false;
+      if(tabIdx === 2) HS_IS_EDIT_MODE_2 = false;
+  }
+
+  function HS_batCheDoSua(tabIdx) {
+    if(tabIdx === 1) {
+       HS_IS_EDIT_MODE_1 = true;
+       document.getElementById('btnEdit1').style.display = 'none';
+       document.getElementById('groupEdit1').style.display = 'inline-block';
+       let isSuperAdmin = (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes('ALL'));
+       document.getElementById('btnChuyenLop').style.display = isSuperAdmin ? 'inline-block' : 'none';
+       HS_capNhatTrangThaiInput('#bang1', false);
+    } else {
+       HS_IS_EDIT_MODE_2 = true;
+       document.getElementById('btnEdit2').style.display = 'none';
+       document.getElementById('groupEdit2').style.display = 'inline-block';
+       HS_capNhatTrangThaiInput('#bang2', false);
+    }
+  }
+
+  function HS_resetEditMode(tabIdx) {
+    let nam = document.getElementById(`t${tabIdx}_nam`).value;
+    let lop = document.getElementById(`t${tabIdx}_lop`).value;
+    let key = `${nam}_${lop}`;
+    let isSuperAdmin = (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes('ALL'));
+    let coQuyen = isSuperAdmin || (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes(key));
+    let btnSua = document.getElementById(`btnEdit${tabIdx}`);
+
+    if(tabIdx === 1) {
+       HS_IS_EDIT_MODE_1 = false;
+       btnSua.style.display = coQuyen ? 'inline-block' : 'none'; 
+       document.getElementById('groupEdit1').style.display = 'none';
+       HS_capNhatTrangThaiInput('#bang1', true);
+    } else if(tabIdx === 2) {
+       HS_IS_EDIT_MODE_2 = false;
+       btnSua.style.display = coQuyen ? 'inline-block' : 'none'; 
+       document.getElementById('groupEdit2').style.display = 'none';
+       HS_capNhatTrangThaiInput('#bang2', true);
+    }
+  }
+
+  function HS_capNhatTrangThaiInput(tableSelector, isDisabled) {
+    const table = document.querySelector(tableSelector);
+    let isSuperAdmin = (HS_CAU_HINH && HS_CAU_HINH.isSuperAdmin === true);
+    const inputs = table.querySelectorAll('input, select');
+    
+    inputs.forEach(el => {
+       if (isDisabled) {
+           el.disabled = true; 
+       } else {
+           if (isSuperAdmin) {
+               el.disabled = false; 
+           } else {
+               if (tableSelector === '#bang1') {
+                   el.disabled = false; 
+               } else {
+                   if (el.type === 'checkbox' && el.name && el.name !== "") {
+                       const groupCheckboxes = table.querySelectorAll(`input[name="${el.name}"]`);
+                       let groupHasData = Array.from(groupCheckboxes).some(cb => cb.checked);
+                       el.disabled = groupHasData;
+                   } else {
+                       let coDuLieu = false;
+                       if (el.type === 'checkbox') coDuLieu = el.checked; 
+                       else coDuLieu = el.value && String(el.value).trim() !== "";
+                       el.disabled = coDuLieu;
+                   }
+               }
+           }
+       }
+    });
+
+    const deleteBtns = table.querySelectorAll('.bi-x-circle-fill, .btn-xoa-nguon');
+    deleteBtns.forEach(btn => {
+        let choPhepHien = !isDisabled;
+        if (!isSuperAdmin && tableSelector !== '#bang1') choPhepHien = false; 
+        btn.style.display = choPhepHien ? 'inline-block' : 'none';
+    });
+
+    if (isSuperAdmin && tableSelector === '#bang1') {
+        const sttLabels = table.querySelectorAll('.stt-label');
+        sttLabels.forEach(lbl => {
+            lbl.style.display = isDisabled ? 'inline-block' : 'none';
+        });
+    }
+  }
+
+  // --- TAB 1 FUNCTION ---
+  function HS_taiTab1() {
+    HS_batLoading(true);
+    let nam = document.getElementById('t1_nam').value;
+    let lop = document.getElementById('t1_lop').value;
+    let key = `${nam}_${lop}`;
+    let isSuperAdmin = (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes('ALL'));
+    let coQuyen = isSuperAdmin || (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes(key));
+
+    if(coQuyen) document.getElementById('btnEdit1').style.display = 'inline-block';
+    else document.getElementById('btnEdit1').style.display = 'none';
+
+    HS_resetEditMode(1);
+    const boLoc = {
+      namHoc: nam, lop: lop, cccd: document.getElementById('t1_cccd').value,
+      hoDem: document.getElementById('t1_hodem').value, ten: document.getElementById('t1_ten').value
+    };
+    callServer('HS_timKiemHocSinh', {filter: boLoc}).then(HS_hienThiBang1).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+  }
+
+  function HS_hienThiBang1(duLieu) {
+    const tbody = document.querySelector('#bang1 tbody'); tbody.innerHTML = '';
+    duLieu.forEach(hang => HS_themDongTab1(hang));
+    HS_batLoading(false);
+  }
+
+  function HS_themDongTab1(duLieu = null) {
+    const tbody = document.querySelector('#bang1 tbody');
+    const tr = document.createElement('tr');
+    let tdXoa = document.createElement('td'); tdXoa.className = 'text-center align-middle'; 
+    let nutXoaHtml = '';
+    let isSuperAdmin = HS_CAU_HINH.isSuperAdmin;
+    
+    if (!duLieu) {
+       let display = HS_IS_EDIT_MODE_1 ? 'inline-block' : 'none';
+       nutXoaHtml = `<i class="bi bi-x-circle-fill text-secondary fs-6" style="cursor:pointer; display:${display}" title="Hủy" onclick="this.closest('tr').remove()"></i>`;
+    } else {
+       let sttText = tbody.rows.length + 1;
+       let displayXoa = (HS_IS_EDIT_MODE_1 && isSuperAdmin) ? 'inline-block' : 'none'; 
+       let displaySTT = (HS_IS_EDIT_MODE_1 && isSuperAdmin) ? 'none' : 'inline-block';
+       if (isSuperAdmin) {
+           let dataStr = JSON.stringify({ nam: duLieu[0], lop: duLieu[1], cccd: duLieu[2], ho: duLieu[3], ten: duLieu[4] }).replace(/"/g, "&quot;");
+           nutXoaHtml = `
+             <span class="text-muted stt-label" style="font-size:12px; display:${displaySTT}">${sttText}</span>
+             <i class="bi bi-trash3-fill text-danger fs-6 btn-xoa-nguon" style="cursor:pointer; display:${displayXoa}" onclick="HS_xunLyXoaNguon(this, ${dataStr})"></i>
+           `;
+       } else {
+           nutXoaHtml = `<span class="text-muted stt-label" style="font-size:12px;">${sttText}</span>`; 
+       }
+    }
+    tdXoa.innerHTML = nutXoaHtml; tr.appendChild(tdXoa);
+
+    let preFillYear = !duLieu ? document.getElementById('t1_nam').value : "";
+    let preFillClass = !duLieu ? document.getElementById('t1_lop').value : "";
+    const cauHinhCot = [
+      {k:'sel', o:HS_CAU_HINH.namHoc}, {k:'sel', o:HS_CAU_HINH.lop}, 
+      {k:'text'}, {k:'text'}, {k:'text'}, {k:'text'}, {k:'sel', o:['Nam','Nữ']},
+      {k:'text'}, {k:'text'}, {k:'sel', o:HS_CAU_HINH.danToc},
+      {k:'text'}, {k:'text'}, {k:'num'}, {k:'num'}, {k:'num'},
+      {k:'text'}, {k:'text'}, {k:'text'}, {k:'check'}
+    ];
+
+    let isDisabled = !HS_IS_EDIT_MODE_1;
+    cauHinhCot.forEach((conf, idx) => {
+      let td = document.createElement('td'); 
+      let val = duLieu ? duLieu[idx] : (idx === 0 ? preFillYear : (idx === 1 ? preFillClass : ""));
+      if(conf.k === 'sel') {
+        let sel = document.createElement('select'); sel.className = 'cell-input'; sel.disabled = isDisabled;
+        conf.o.forEach(opt => { let o = document.createElement('option'); o.value = opt; o.text = opt; if(String(opt) === String(val)) o.selected = true; sel.add(o); });
+        td.appendChild(sel);
+      } else if (conf.k === 'check') {
+        let chk = document.createElement('input'); chk.type = 'checkbox'; chk.disabled = isDisabled;
+        if(String(val).toLowerCase() === 'x') chk.checked = true;
+        td.className = 'text-center'; td.appendChild(chk);
+      } else {
+        let inp = document.createElement('input'); inp.className = 'cell-input'; inp.disabled = isDisabled;
+        inp.type = conf.k === 'date' ? 'date' : (conf.k === 'num' ? 'number' : 'text');
+        inp.value = val;
+        if(idx === 5) inp.placeholder = "dd/mm/yyyy"; td.appendChild(inp);
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+
+  function HS_xunLyXoaNguon(btn, info) {
+      Swal.fire({
+        title: 'CẢNH BÁO XÓA DỮ LIỆU!',
+        html: `Xóa học sinh: <b style="color:#b71c1c;">${info.ho} ${info.ten}</b>?<br/>Hành động này không thể hoàn tác.`,
+        icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Xóa ngay'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          HS_batLoading(true);
+          callServer('HS_xoaHocSinh', {info: info, sysAuth: currentProfile.reqId}).then(res => {
+              HS_batLoading(false);
+              if(res.message === 'SUCCESS') { Swal.fire('Thành công!', 'Đã xóa.', 'success'); btn.closest('tr').remove(); } 
+              else { Swal.fire('Thất bại', res.message, 'error'); }
+          }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+        }
+      });
+  }
+
+  function HS_luuTab1() {
+    const tbody = document.querySelector('#bang1 tbody'); let duLieuLuu = [];
+    for (let tr of tbody.rows) {
+      let hang = [];
+      for (let i = 1; i < tr.cells.length; i++) {
+        let el = tr.cells[i].firstElementChild;
+        if(el.type === 'checkbox') hang.push(el.checked ? 'x' : ''); else hang.push(el.value);
+      }
+      if(hang[0] && hang[1] && hang[3] && hang[4]) duLieuLuu.push(hang);
+    }
+    if(duLieuLuu.length === 0) { Swal.fire("Lỗi!", "Thiếu thông tin!", "error"); return; }
+    HS_batLoading(true);
+    callServer('HS_luuThongTinTab1', {dataRows: duLieuLuu}).then(res => { 
+      Swal.fire("Thành công!", res.message, "success"); HS_resetEditMode(1); HS_taiTab1(); 
+    }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+  }
+  
+  function HS_chuyenLop() {
+      Swal.fire({
+        title: 'Chuyển lớp', text: "Xác nhận chuyển lớp?", icon: 'warning', showCancelButton: true, confirmButtonText: 'Đồng ý'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const tbody = document.querySelector('#bang1 tbody'); let duLieuLuu = [];
+          for (let tr of tbody.rows) {
+            let hang = [];
+            for (let i = 1; i < tr.cells.length; i++) {
+              let el = tr.cells[i].firstElementChild;
+              if(el.type === 'checkbox') hang.push(el.checked ? 'x' : ''); else hang.push(el.value);
+            }
+            if(hang[0] && hang[1]) duLieuLuu.push(hang);
+          }
+          if(duLieuLuu.length === 0) return;
+          HS_batLoading(true);
+          callServer('HS_chuyenHocSinh', {dataRows: duLieuLuu}).then(res => { 
+              let iconType = res.message.includes("thành công") ? "success" : "info";
+              Swal.fire("Kết quả", res.message, iconType); HS_resetEditMode(1); HS_taiTab1();
+          }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+        }
+      });
+  }
+
+  // --- TAB 2 FUNCTIONS ---
+  function HS_taiTab2() {
+    HS_batLoading(true);
+    let nam = document.getElementById('t2_nam').value;
+    let lop = document.getElementById('t2_lop').value;
+    let key = `${nam}_${lop}`;
+    let isSuperAdmin = (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes('ALL'));
+    let coQuyen = isSuperAdmin || (HS_CAU_HINH.quyenSua && HS_CAU_HINH.quyenSua.includes(key));
+    
+    if(coQuyen) document.getElementById('btnEdit2').style.display = 'inline-block';
+    else document.getElementById('btnEdit2').style.display = 'none';
+    
+    HS_resetEditMode(2);
+    const boLoc = { namHoc: nam, lop: lop, cccd: document.getElementById('t2_cccd').value, hoDem: document.getElementById('t2_hodem').value, ten: document.getElementById('t2_ten').value };
+    callServer('HS_timKiemHocSinh', {filter: boLoc}).then(HS_hienThiBang2).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+  }
+
+  function HS_hienThiBang2(duLieu) {
+    const tbody = document.querySelector('#bang2 tbody'); tbody.innerHTML = '';
+    duLieu.forEach(hang => {
+      let tr = document.createElement('tr');
+      let htmlCoDinh = `<td class="text-primary fw-bold">${hang[2]}</td><td>${hang[3]}</td><td>${hang[4]}</td><td>${hang[5]}</td><td>${hang[6]}</td>`;
+      tr.innerHTML = htmlCoDinh;
+      
+      let isDisabled = !HS_IS_EDIT_MODE_2;
+
+      for (let i = 19; i <= 46; i++) {
+        let td = document.createElement('td'); td.className = 'text-center';
+        let chk = document.createElement('input'); chk.type = 'checkbox'; 
+        chk.disabled = isDisabled;
+ 
+        if(String(hang[i]).toLowerCase() === 'x') chk.checked = true;
+        
+        if(i >= 19 && i <= 22) {
+           chk.name = `kq_hk1_${hang[2]}`;
+           chk.onclick = function() { tr.querySelectorAll(`input[name="kq_hk1_${hang[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+        }
+        if(i >= 23 && i <= 26) { 
+           chk.name = `kq_cn_${hang[2]}`;
+           chk.onclick = function() { tr.querySelectorAll(`input[name="kq_cn_${hang[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+        }
+        if(i >= 27) { 
+           let nhom = Math.floor((i - 27) / 4);
+           chk.name = `tt_${nhom}_${hang[2]}`;
+           chk.onclick = function() { tr.querySelectorAll(`input[name="tt_${nhom}_${hang[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+        }
+        td.appendChild(chk);
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    });
+    HS_batLoading(false);
+  }
+
+  function HS_luuTab2() {
+    const tbody = document.querySelector('#bang2 tbody'); let duLieuLuu = [];
+    for (let tr of tbody.rows) {
+      let cccd = tr.cells[0].innerText;
+      let ho = tr.cells[1].innerText;
+      let ten = tr.cells[2].innerText;
+      let nam = document.getElementById('t2_nam').value;
+      let lop = document.getElementById('t2_lop').value;
+      if(!nam || !lop) { Swal.fire("Lỗi!", "Chọn Năm và Lớp!", "error"); return; }
+      
+      let mangKetQua = [nam, lop, cccd, ho, ten];
+      for(let i=5; i < tr.cells.length; i++) {
+        mangKetQua.push(tr.cells[i].firstElementChild.checked ? 'x' : '');
+      }
+      duLieuLuu.push(mangKetQua);
+    }
+    HS_batLoading(true);
+    callServer('HS_luuKetQuaTab2', {dataRows: duLieuLuu}).then(res => { 
+        Swal.fire("Thông báo", res.message, "success"); HS_resetEditMode(2); HS_batLoading(false); 
+    }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+  }
+
+  function HS_taiThongKe() {
+    let nam = document.getElementById('t3_nam').value;
+    if(!nam) { Swal.fire("Lỗi!", "Chưa chọn năm học!", "error"); return; }
+    HS_batLoading(true);
+    callServer('HS_layDuLieuThongKe', {namHoc: nam}).then(res => HS_hienThiThongKe(res.data)).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+  }
+
+  function HS_formatCell(val) { return val > 0 ? `<span class="has-val">${val}</span>` : `<span class="zero-val">0</span>`; }
+
+  function HS_taoDoiTuongRong(tenLop) {
+      let obj = {
+          lop: tenLop, tongSo: 0, danToc: 0, nu: 0, nuDanToc: 0, khuyetTat: 0, nuKhuyetTat: 0,
+          ngheo: 0, canNgheo: 0, chinhSach: 0, bhyt: 0, htxs: 0, htt: 0, ht: 0, cht: 0,
+          tuoi: {}, thanhTich: { xa: {}, huyen: {}, tinh: {}, qg: {}, qt: {} }
+      };
+      for(let i=6; i<=19; i++) obj.tuoi[i] = {ts:0, nu:0};
+      ['xa','huyen','tinh','qg','qt'].forEach(cap => { for(let i=1; i<=4; i++) obj.thanhTich[cap][i] = 0; });
+      return obj;
+  }
+
+  function HS_congDonData(goc, them) {
+      goc.tongSo += them.tongSo || 0; goc.danToc += them.danToc || 0;
+      goc.nu += them.nu || 0; goc.nuDanToc += them.nuDanToc || 0;
+      goc.khuyetTat += them.khuyetTat || 0; goc.nuKhuyetTat += them.nuKhuyetTat || 0;
+      goc.ngheo += them.ngheo || 0; goc.canNgheo += them.canNgheo || 0;
+      goc.chinhSach += them.chinhSach || 0; goc.bhyt += them.bhyt || 0;
+      goc.htxs += them.htxs || 0; goc.htt += them.htt || 0;
+      goc.ht += them.ht || 0; goc.cht += them.cht || 0;
+
+      for(let i=6; i<=19; i++) { 
+          if(them.tuoi[i]) { goc.tuoi[i].ts += them.tuoi[i].ts || 0; goc.tuoi[i].nu += them.tuoi[i].nu || 0; }
+      }
+      ['xa','huyen','tinh','qg','qt'].forEach(cap => {
+          for(let i=1; i<=4; i++) { if(them.thanhTich && them.thanhTich[cap]) goc.thanhTich[cap][i] += them.thanhTich[cap][i] || 0; }
+      });
+  }
+
+  function HS_taoHtmlDong_SoLuong(item, stt, cssClass, labelLop = null, cap = 'TH') {
+      let lopHienThi = labelLop ? labelLop : item.lop;
+      let dsTuoi = cap === 'TH' ? [6,7,8,9,10,11,12,13,14] : [11,12,13,14,15,16,17,18,19];
+      
+      return `<tr class="${cssClass}">
+        <td>${stt}</td>
+        <td class="fw-bold text-start px-2 ${cssClass === '' ? 'text-primary' : ''}">${lopHienThi}</td>
+        <td class="col-compact fw-bold">${HS_formatCell(item.tongSo)}</td>
+        <td class="col-compact">${HS_formatCell(item.danToc)}</td>
+        <td class="col-compact">${HS_formatCell(item.nu)}</td>
+        <td class="col-compact">${HS_formatCell(item.nuDanToc)}</td>
+        <td class="col-compact">${HS_formatCell(item.khuyetTat)}</td> 
+        <td class="col-compact">${HS_formatCell(item.nuKhuyetTat)}</td>
+        <td class="col-compact">${HS_formatCell(item.ngheo)}</td> 
+        <td class="col-compact">${HS_formatCell(item.canNgheo)}</td> 
+        <td class="col-compact">${HS_formatCell(item.chinhSach)}</td> 
+        <td class="col-compact">${HS_formatCell(item.bhyt)}</td>
+        ${dsTuoi.map(age => { 
+            let cellTS = HS_formatCell(item.tuoi[age] ? item.tuoi[age].ts : 0); 
+            let cellNu = HS_formatCell(item.tuoi[age] ? item.tuoi[age].nu : 0); 
+            return `<td class="col-compact">${cellTS}</td><td class="col-compact border-end">${cellNu}</td>`;
+        }).join('')}
+      </tr>`;
+  }
+
+  function HS_taoHtmlDong_ChatLuong(item, stt, cssClass, labelLop = null) {
+      let lopHienThi = labelLop ? labelLop : item.lop;
+      return `<tr class="${cssClass}">
+        <td>${stt}</td>
+        <td class="fw-bold text-start px-2 ${cssClass === '' ? 'text-primary' : ''}">${lopHienThi}</td>
+        <td class="col-compact fw-bold">${HS_formatCell(item.tongSo)}</td>
+        <td class="col-compact">${HS_formatCell(item.htxs)}</td>
+        <td class="col-compact">${HS_formatCell(item.htt)}</td>
+        <td class="col-compact">${HS_formatCell(item.ht)}</td>
+        <td class="col-compact">${HS_formatCell(item.cht)}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.xa[1])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.xa[2])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.xa[3])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.xa[4])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.huyen[1])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.huyen[2])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.huyen[3])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.huyen[4])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.tinh[1])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.tinh[2])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.tinh[3])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.tinh[4])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qg[1])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qg[2])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qg[3])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qg[4])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qt[1])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qt[2])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qt[3])}</td>
+        <td class="col-compact">${HS_formatCell(item.thanhTich.qt[4])}</td>
+      </tr>`;
+  }
+
+  function HS_hienThiThongKe(data) {
+    const b_th = document.querySelector('#bang3_1 tbody');
+    const b_thcs = document.querySelector('#bang3_1_thcs tbody');
+    const b_cl = document.querySelector('#bang3_2 tbody');
+    b_th.innerHTML = ''; b_thcs.innerHTML = ''; b_cl.innerHTML = '';
+    
+    let tongCaTruong = data.find(item => item.lop === 'TỔNG');
+    let danhSachLop = data.filter(item => item.lop !== 'TỔNG');
+    
+    let tongTH = HS_taoDoiTuongRong('TỔNG CẤP TIỂU HỌC');
+    let tongTHCS = HS_taoDoiTuongRong('TỔNG CẤP THCS');
+
+    let khoiHienTai = null;
+    let tongKhoi = null;
+    let sttTH = 1, sttTHCS = 1, sttCL = 1;
+
+    danhSachLop.forEach((item) => {
+        let match = item.lop.match(/^\d+/);
+        let khoi = match ? parseInt(match[0]) : 0;
+        let isTH = (khoi >= 1 && khoi <= 5);
+        let isTHCS = (khoi >= 6 && khoi <= 9);
+
+        if (khoiHienTai !== null && khoi !== khoiHienTai) {
+            let wasTH = (khoiHienTai >= 1 && khoiHienTai <= 5);
+            if (wasTH) b_th.innerHTML += HS_taoHtmlDong_SoLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`, 'TH');
+            else b_thcs.innerHTML += HS_taoHtmlDong_SoLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`, 'THCS');
+            b_cl.innerHTML += HS_taoHtmlDong_ChatLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`);
+            tongKhoi = null;
+        }
+
+        if (tongKhoi === null) {
+            khoiHienTai = khoi;
+            tongKhoi = HS_taoDoiTuongRong(`Cộng Khối ${khoi}`);
+        }
+
+        HS_congDonData(tongKhoi, item);
+        if (isTH) HS_congDonData(tongTH, item);
+        else if (isTHCS) HS_congDonData(tongTHCS, item);
+
+        if (isTH) b_th.innerHTML += HS_taoHtmlDong_SoLuong(item, sttTH++, '', null, 'TH');
+        else if (isTHCS) b_thcs.innerHTML += HS_taoHtmlDong_SoLuong(item, sttTHCS++, '', null, 'THCS');
+        b_cl.innerHTML += HS_taoHtmlDong_ChatLuong(item, sttCL++, '', null);
+    });
+
+    if (tongKhoi !== null) {
+        let wasTH = (khoiHienTai >= 1 && khoiHienTai <= 5);
+        if (wasTH) b_th.innerHTML += HS_taoHtmlDong_SoLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`, 'TH');
+        else b_thcs.innerHTML += HS_taoHtmlDong_SoLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`, 'THCS');
+        b_cl.innerHTML += HS_taoHtmlDong_ChatLuong(tongKhoi, '', 'row-grade-total', `Cộng Khối ${khoiHienTai}`);
+    }
+
+    if(tongTH.tongSo > 0) b_th.innerHTML += HS_taoHtmlDong_SoLuong(tongTH, '', 'row-total', null, 'TH');
+    if(tongTHCS.tongSo > 0) b_thcs.innerHTML += HS_taoHtmlDong_SoLuong(tongTHCS, '', 'row-total', null, 'THCS');
+    if (tongCaTruong) b_cl.innerHTML += HS_taoHtmlDong_ChatLuong(tongCaTruong, '', 'row-total', null);
+
+    HS_batLoading(false);
+  }
+</script>
+
+</body>
+</html>
