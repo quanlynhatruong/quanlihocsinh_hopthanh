@@ -577,6 +577,9 @@
         HS_ganSuKienLoc();
         
         callServer('HS_layDuLieuCauHinh', {sysAuth: currentProfile.reqId}).then(dulieu => {
+            // FIX BẢO MẬT: Chặn lỗi nếu server báo không được phép lấy cấu hình
+            if(dulieu.success === false) { Swal.fire('Lỗi bảo mật', dulieu.message, 'error'); HS_batLoading(false); return; }
+            
             HS_CAU_HINH = dulieu;
             HS_dienDuLieuSelect();
             
@@ -733,7 +736,12 @@
       namHoc: nam, lop: lop, cccd: document.getElementById('t1_cccd').value,
       hoDem: document.getElementById('t1_hodem').value, ten: document.getElementById('t1_ten').value
     };
-    callServer('HS_timKiemHocSinh', {filter: boLoc}).then(HS_hienThiBang1).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+    
+    // FIX BẢO MẬT: Bổ sung sysAuth vào mọi luồng lấy dữ liệu
+    callServer('HS_timKiemHocSinh', {filter: boLoc, sysAuth: currentProfile.reqId}).then(res => {
+        if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
+        HS_hienThiBang1(res);
+    }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
   }
 
   function HS_hienThiBang1(duLieu) {
@@ -809,8 +817,12 @@
       }).then((result) => {
         if (result.isConfirmed) {
           HS_batLoading(true);
+          
+          // FIX BẢO MẬT
           callServer('HS_xoaHocSinh', {info: info, sysAuth: currentProfile.reqId}).then(res => {
               HS_batLoading(false);
+              if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); return; }
+              
               if(res.message === 'SUCCESS') { Swal.fire('Thành công!', 'Đã xóa.', 'success'); btn.closest('tr').remove(); } 
               else { Swal.fire('Thất bại', res.message, 'error'); }
           }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
@@ -830,7 +842,10 @@
     }
     if(duLieuLuu.length === 0) { Swal.fire("Lỗi!", "Thiếu thông tin!", "error"); return; }
     HS_batLoading(true);
-    callServer('HS_luuThongTinTab1', {dataRows: duLieuLuu}).then(res => { 
+    
+    // FIX BẢO MẬT
+    callServer('HS_luuThongTinTab1', {dataRows: duLieuLuu, sysAuth: currentProfile.reqId}).then(res => { 
+      if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
       Swal.fire("Thành công!", res.message, "success"); HS_resetEditMode(1); HS_taiTab1(); 
     }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
   }
@@ -851,7 +866,10 @@
           }
           if(duLieuLuu.length === 0) return;
           HS_batLoading(true);
-          callServer('HS_chuyenHocSinh', {dataRows: duLieuLuu}).then(res => { 
+          
+          // FIX BẢO MẬT
+          callServer('HS_chuyenHocSinh', {dataRows: duLieuLuu, sysAuth: currentProfile.reqId}).then(res => { 
+              if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
               let iconType = res.message.includes("thành công") ? "success" : "info";
               Swal.fire("Kết quả", res.message, iconType); HS_resetEditMode(1); HS_taiTab1();
           }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
@@ -873,7 +891,12 @@
     
     HS_resetEditMode(2);
     const boLoc = { namHoc: nam, lop: lop, cccd: document.getElementById('t2_cccd').value, hoDem: document.getElementById('t2_hodem').value, ten: document.getElementById('t2_ten').value };
-    callServer('HS_timKiemHocSinh', {filter: boLoc}).then(HS_hienThiBang2).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+    
+    // FIX BẢO MẬT
+    callServer('HS_timKiemHocSinh', {filter: boLoc, sysAuth: currentProfile.reqId}).then(res => {
+        if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
+        HS_hienThiBang2(res);
+    }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
   }
 
   function HS_hienThiBang2(duLieu) {
@@ -930,7 +953,10 @@
       duLieuLuu.push(mangKetQua);
     }
     HS_batLoading(true);
-    callServer('HS_luuKetQuaTab2', {dataRows: duLieuLuu}).then(res => { 
+    
+    // FIX BẢO MẬT
+    callServer('HS_luuKetQuaTab2', {dataRows: duLieuLuu, sysAuth: currentProfile.reqId}).then(res => { 
+        if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
         Swal.fire("Thông báo", res.message, "success"); HS_resetEditMode(2); HS_batLoading(false); 
     }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
   }
@@ -939,7 +965,12 @@
     let nam = document.getElementById('t3_nam').value;
     if(!nam) { Swal.fire("Lỗi!", "Chưa chọn năm học!", "error"); return; }
     HS_batLoading(true);
-    callServer('HS_layDuLieuThongKe', {namHoc: nam}).then(res => HS_hienThiThongKe(res.data)).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
+    
+    // FIX BẢO MẬT
+    callServer('HS_layDuLieuThongKe', {namHoc: nam, sysAuth: currentProfile.reqId}).then(res => {
+        if(res.success === false) { Swal.fire('Lỗi bảo mật', res.message, 'error'); HS_batLoading(false); return; }
+        HS_hienThiThongKe(res.data);
+    }).catch(e => { Swal.fire('Lỗi', e.message, 'error'); HS_batLoading(false); });
   }
 
   function HS_formatCell(val) { return val > 0 ? `<span class="has-val">${val}</span>` : `<span class="zero-val">0</span>`; }
