@@ -5,7 +5,6 @@
   <base target="_top">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <title>Quản lý học sinh- TH&THCS Hợp Thành</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -56,6 +55,9 @@
     input[type="checkbox"]:disabled { opacity: 1 !important; filter: none !important; cursor: not-allowed; border: 2px solid #666 !important; background-color: #fff !important; width: 16px; height: 16px; appearance: none; -webkit-appearance: none; display: inline-block; position: relative; vertical-align: middle; border-radius: 3px; }
     input[type="checkbox"]:checked:disabled { background-color: #003366 !important; border-color: #003366 !important; opacity: 1 !important; }
     input[type="checkbox"]:checked:disabled::after { content: ''; position: absolute; left: 4px; top: 1px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+    /* Nâng cấp input number ẩn mũi tên (spinners) */
+    input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
     .filter-box { background: rgba(255,255,255,0.9); border: 1px solid #aaa; border-left: 5px solid #b71c1c; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
     label { font-weight: 700; color: #003366; font-size: 13px; margin-bottom: 2px; display: block;}
     .edit-mode-btn { display: none; }
@@ -142,7 +144,7 @@
     <div class="dev-badge d-flex align-items-center">
         <div class="me-1">
             <div class="dev-name">Hoàng Ngọc Lâm</div>
-            <div class="dev-role">Phát triển bởi</div>
+            <div class="dev-role">Thiết kế và phát triển</div>
         </div>
         <i class="bi bi-gem diamond-icon"></i>
     </div>
@@ -828,6 +830,7 @@
     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
   }
 
+  // Hàm đã được nâng cấp chuyển cột thành tích thành input dạng số nguyên
   function hks_veBangPhanHai_fn(hks_duLieuBang_arr) {
     const hks_thanBang_el = document.querySelector('#bang2 tbody'); hks_thanBang_el.innerHTML = '';
     hks_duLieuBang_arr.forEach(hks_dongDuLieu_arr => {
@@ -839,25 +842,36 @@
 
       for (let i = 19; i <= 46; i++) {
         let hks_theCot_el = document.createElement('td'); hks_theCot_el.className = 'text-center';
-        let hks_theHopKiem_el = document.createElement('input'); hks_theHopKiem_el.type = 'checkbox'; 
-        hks_theHopKiem_el.disabled = hks_voHieuHoa_bol;
- 
-        if(String(hks_dongDuLieu_arr[i]).toLowerCase() === 'x') hks_theHopKiem_el.checked = true;
         
-        if(i >= 19 && i <= 22) {
-           hks_theHopKiem_el.name = `kq_hk1_${hks_dongDuLieu_arr[2]}`;
-           hks_theHopKiem_el.onclick = function() { hks_theDong_el.querySelectorAll(`input[name="kq_hk1_${hks_dongDuLieu_arr[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+        if (i >= 19 && i <= 26) {
+           let hks_theHopKiem_el = document.createElement('input'); hks_theHopKiem_el.type = 'checkbox'; 
+           hks_theHopKiem_el.disabled = hks_voHieuHoa_bol;
+    
+           if(String(hks_dongDuLieu_arr[i]).toLowerCase() === 'x') hks_theHopKiem_el.checked = true;
+           
+           if(i >= 19 && i <= 22) {
+              hks_theHopKiem_el.name = `kq_hk1_${hks_dongDuLieu_arr[2]}`;
+              hks_theHopKiem_el.onclick = function() { hks_theDong_el.querySelectorAll(`input[name="kq_hk1_${hks_dongDuLieu_arr[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+           }
+           if(i >= 23 && i <= 26) { 
+              hks_theHopKiem_el.name = `kq_cn_${hks_dongDuLieu_arr[2]}`;
+              hks_theHopKiem_el.onclick = function() { hks_theDong_el.querySelectorAll(`input[name="kq_cn_${hks_dongDuLieu_arr[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
+           }
+           hks_theCot_el.appendChild(hks_theHopKiem_el);
+        } else {
+           let hks_theNhapSo_el = document.createElement('input'); 
+           hks_theNhapSo_el.type = 'number';
+           hks_theNhapSo_el.className = 'cell-input text-center fw-bold text-danger';
+           hks_theNhapSo_el.min = '0';
+           hks_theNhapSo_el.disabled = hks_voHieuHoa_bol;
+           
+           let hks_giaTriHienTai_num = parseInt(hks_dongDuLieu_arr[i]);
+           if(!isNaN(hks_giaTriHienTai_num) && hks_giaTriHienTai_num > 0) {
+               hks_theNhapSo_el.value = hks_giaTriHienTai_num;
+           }
+           hks_theCot_el.appendChild(hks_theNhapSo_el);
         }
-        if(i >= 23 && i <= 26) { 
-           hks_theHopKiem_el.name = `kq_cn_${hks_dongDuLieu_arr[2]}`;
-           hks_theHopKiem_el.onclick = function() { hks_theDong_el.querySelectorAll(`input[name="kq_cn_${hks_dongDuLieu_arr[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
-        }
-        if(i >= 27) { 
-           let hks_nhomThuTu_num = Math.floor((i - 27) / 4);
-           hks_theHopKiem_el.name = `tt_${hks_nhomThuTu_num}_${hks_dongDuLieu_arr[2]}`;
-           hks_theHopKiem_el.onclick = function() { hks_theDong_el.querySelectorAll(`input[name="tt_${hks_nhomThuTu_num}_${hks_dongDuLieu_arr[2]}"]`).forEach(c => {if(c!==this)c.checked=false}) };
-        }
-        hks_theCot_el.appendChild(hks_theHopKiem_el);
+
         hks_theDong_el.appendChild(hks_theCot_el);
       }
       hks_thanBang_el.appendChild(hks_theDong_el);
@@ -865,6 +879,7 @@
     hks_hienThiManHinhTai_fn(false);
   }
 
+  // Hàm lưu phân hệ 2 đã được cập nhật luồng xử lý riêng cho input dạng số
   function hks_dayDuLieuPhanHai_fn() {
     const hks_thanBang_el = document.querySelector('#bang2 tbody'); let hks_duLieuCanLuu_arr = [];
     for (let hks_theDong_el of hks_thanBang_el.rows) {
@@ -877,7 +892,12 @@
       
       let hks_mangKetQuaLuu_arr = [hks_namChon_str, hks_lopChon_str, hks_truong1, hks_truong2, hks_truong3];
       for(let i=5; i < hks_theDong_el.cells.length; i++) {
-        hks_mangKetQuaLuu_arr.push(hks_theDong_el.cells[i].firstElementChild.checked ? 'x' : '');
+        let hks_phanTuLayDuLieu_el = hks_theDong_el.cells[i].firstElementChild;
+        if(hks_phanTuLayDuLieu_el.type === 'checkbox') {
+            hks_mangKetQuaLuu_arr.push(hks_phanTuLayDuLieu_el.checked ? 'x' : '');
+        } else {
+            hks_mangKetQuaLuu_arr.push(hks_phanTuLayDuLieu_el.value);
+        }
       }
       hks_duLieuCanLuu_arr.push(hks_mangKetQuaLuu_arr);
     }
