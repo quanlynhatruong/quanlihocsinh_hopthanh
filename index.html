@@ -637,20 +637,23 @@
                    let hks_tenNhom_str = hks_phanTuUI_el.name || "";
                    
                    if (hks_tenNhom_str.startsWith('tt_')) {
-                       // PHÂN HỆ THÀNH TÍCH: Khóa độc lập từng ô nếu có dữ liệu (Số giải > 0)
+                       // PHÂN HỆ THÀNH TÍCH: Khóa độc lập từng ô
                        let hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
-                       hks_phanTuUI_el.disabled = hks_coDuLieu_bol;
+                       hks_phanTuUI_el.disabled = Boolean(hks_coDuLieu_bol);
                    } else if (hks_tenNhom_str.startsWith('kq_')) {
-                       // PHÂN HỆ KẾT QUẢ HỌC TẬP: Khóa theo nhóm (Nếu 1 ô trong nhóm có tích 'x' thì khóa cả nhóm)
-                       const hks_nhomTap_arr = hks_bangDuLieuUI_el.querySelectorAll(`input[name="${hks_tenNhom_str}"]`);
-                       let hks_nhomCoDuLieu_bol = Array.from(hks_nhomTap_arr).some(el => el.checked);
-                       hks_phanTuUI_el.disabled = hks_nhomCoDuLieu_bol;
+                       // PHÂN HỆ KẾT QUẢ HỌC TẬP: Khóa theo nhóm (có 1 ô tích là khóa cả nhóm)
+                       try {
+                           const hks_nhomTap_arr = hks_bangDuLieuUI_el.querySelectorAll(`input[name="${hks_tenNhom_str}"]`);
+                           let hks_nhomCoDuLieu_bol = Array.from(hks_nhomTap_arr).some(el => el.checked);
+                           hks_phanTuUI_el.disabled = Boolean(hks_nhomCoDuLieu_bol);
+                       } catch(e) {
+                           hks_phanTuUI_el.disabled = Boolean(hks_phanTuUI_el.checked);
+                       }
                    } else {
-                       // Các trường hợp mặc định khác
                        let hks_coDuLieu_bol = false;
                        if (hks_phanTuUI_el.type === 'checkbox') hks_coDuLieu_bol = hks_phanTuUI_el.checked; 
                        else hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
-                       hks_phanTuUI_el.disabled = hks_coDuLieu_bol;
+                       hks_phanTuUI_el.disabled = Boolean(hks_coDuLieu_bol);
                    }
                }
            }
@@ -671,7 +674,6 @@
         });
     }
   }
-  
 
   function hks_layDuLieuPhanMot_fn() {
     hks_hienThiManHinhTai_fn(true);
