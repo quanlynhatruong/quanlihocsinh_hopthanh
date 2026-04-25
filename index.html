@@ -619,7 +619,7 @@
   }
 
  // Cập nhật nguyên tắc: Thành tích luôn mở khi có quyền, Kết quả học tập khóa theo nhóm
-  function hks_dieuKhienOVuong_fn(hks_danhDauBang_str, hks_voHieuHoa_bol) {
+ function hks_dieuKhienOVuong_fn(hks_danhDauBang_str, hks_voHieuHoa_bol) {
     const hks_bangDuLieuUI_el = document.querySelector(hks_danhDauBang_str);
     let hks_laQuanTriCapCao_bol = (hks_bienKhungHeThong_obj && hks_bienKhungHeThong_obj.hks_quyenTuyetDoi_bol === true);
     const hks_cacONhap_arr = hks_bangDuLieuUI_el.querySelectorAll('input, select');
@@ -637,10 +637,18 @@
                    let hks_tenNhom_str = hks_phanTuUI_el.name || "";
                    
                    if (hks_tenNhom_str.startsWith('tt_')) {
-                       // PHÂN HỆ THÀNH TÍCH: Không khóa khi giáo viên có quyền cập nhật
+                       // =======================================================
+                       // CÔNG TẮC BẢO VỆ PHÂN HỆ THÀNH TÍCH
+                       // Nếu muốn khóa các ô ĐÃ CÓ DỮ LIỆU: Mở comment 2 dòng dưới và comment dòng "disabled = false"
+                       // =======================================================
+                       // let hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
+                       // hks_phanTuUI_el.disabled = Boolean(hks_coDuLieu_bol);
+                       
+                       // Mã hiện tại: MỞ KHÓA HOÀN TOÀN ô thành tích
                        hks_phanTuUI_el.disabled = false;
+
                    } else if (hks_tenNhom_str.startsWith('kq_')) {
-                       // PHÂN HỆ KẾT QUẢ HỌC TẬP: Khóa theo nhóm (có 1 ô tích là khóa cả nhóm)
+                       // PHÂN HỆ KẾT QUẢ HỌC TẬP: Khóa theo nhóm an toàn
                        try {
                            const hks_nhomTap_arr = hks_bangDuLieuUI_el.querySelectorAll(`input[name="${hks_tenNhom_str}"]`);
                            let hks_nhomCoDuLieu_bol = Array.from(hks_nhomTap_arr).some(el => el.checked);
@@ -649,7 +657,7 @@
                            hks_phanTuUI_el.disabled = Boolean(hks_phanTuUI_el.checked);
                        }
                    } else {
-                       // Mặc định: Có dữ liệu thì khóa
+                       // Các trường hợp mặc định khác
                        let hks_coDuLieu_bol = false;
                        if (hks_phanTuUI_el.type === 'checkbox') hks_coDuLieu_bol = hks_phanTuUI_el.checked; 
                        else hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
