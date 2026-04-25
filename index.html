@@ -852,11 +852,11 @@
           html: `
               <div class="text-start mb-3 mt-3">
                   <label class="fw-bold mb-1" style="color:#003366; font-size:14px;"><i class="bi bi-award-fill text-warning"></i> Số lượng giải đạt được:</label>
-                  <input id="swal-input-so" type="number" min="0" class="form-control fw-bold text-danger text-center" value="${hks_giaTriHienTai_str}" placeholder="Nhập tổng số giải..." style="font-size:15px;">
+                  <input id="swal-input-so" type="number" min="0" class="form-control fw-bold text-danger text-center" value="${hks_giaTriHienTai_str}" placeholder="Nhập số lượng giải" style="font-size:18px;">
               </div>
               <div class="text-start">
-                  <label class="fw-bold mb-1" style="color:#003366; font-size:14px;"><i class="bi bi-card-text text-info"></i> Thông tin minh chứng (Tên cuộc thi, quyết định công nhận):</label>
-                  <textarea id="swal-input-ghichu" class="form-control" rows="3" placeholder="Ví dụ: Đạt giải Nhất thi Tiếng Anh trên mạng Internet, số quyết định công nhận giải...">${hks_ghiChuHienTai_str}</textarea>
+                  <label class="fw-bold mb-1" style="color:#003366; font-size:14px;"><i class="bi bi-card-text text-info"></i> Thông tin minh chứng (Tên cuộc thi):</label>
+                  <textarea id="swal-input-ghichu" class="form-control" rows="3" placeholder="Nhập tên cuộc thi, hội thi, sân chơi, số quyết định công nhận giải.">${hks_ghiChuHienTai_str}</textarea>
               </div>
           `,
           showCancelButton: true,
@@ -978,7 +978,7 @@
            hks_theNhapSo_el.setAttribute('data-note', hks_ghiChu_str);
 
            if(hks_ghiChu_str) {
-               hks_khungChua_el.title = "Minh chứng: " + hks_ghiChu_str;
+               hks_khungChua_el.title = "Thông tin:\n" + hks_ghiChu_str;
                let hks_gocMau_el = document.createElement('div');
                hks_gocMau_el.className = 'note-corner';
                hks_khungChua_el.appendChild(hks_gocMau_el);
