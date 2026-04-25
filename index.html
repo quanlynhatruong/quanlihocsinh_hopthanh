@@ -846,7 +846,7 @@
     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
   }
 
-  // Nâng cấp khối UI popup nhập thành tích
+ // Nâng cấp khối UI popup nhập thành tích (Đã gỡ thuật toán xóa loại trừ lẫn nhau)
   function hks_hienThiUINhapThanhTich_fn(hks_input_el, hks_dong_el, hks_nhom_num, hks_id_str) {
       let hks_giaTriHienTai_str = hks_input_el.value || "";
       let hks_ghiChuHienTai_str = hks_input_el.getAttribute('data-note') || "";
@@ -860,7 +860,7 @@
               </div>
               <div class="text-start">
                   <label class="fw-bold mb-1" style="color:#003366; font-size:14px;"><i class="bi bi-card-text text-info"></i> Thông tin minh chứng (Tên cuộc thi):</label>
-                  <textarea id="swal-input-ghichu" class="form-control" rows="7" placeholder="Nhập tên cuộc thi, hội thi, sân chơi, số quyết định công nhận giải.\n VD:\n - Giải nhất cuộc thi Trạng nguyên tiếng Việt. Quyết định số 06/QD-BTC, ngày 25/4/2026.\n - Giải nhất đấu trường toán học VioEdu. Quyết định số 08/QĐ-BTC, ngày 26/4/2026.\n...">${hks_ghiChuHienTai_str}</textarea>
+                  <textarea id="swal-input-ghichu" class="form-control" rows="5" placeholder="Nhập tên cuộc thi, hội thi, sân chơi, số quyết định công nhận giải.">${hks_ghiChuHienTai_str}</textarea>
               </div>
           `,
           showCancelButton: true,
@@ -880,19 +880,8 @@
               let hks_soMoi_num = parseInt(result.value.so);
               let hks_ghiChuMoi_str = result.value.ghichu.trim();
 
-              // Loại trừ lẫn nhau trong cùng 1 nhóm mức giải
               if (!isNaN(hks_soMoi_num) && hks_soMoi_num > 0) {
-                  hks_dong_el.querySelectorAll(`input[name="tt_${hks_nhom_num}_${hks_id_str}"]`).forEach(c => {
-                      if (c !== hks_input_el) {
-                          c.value = "";
-                          c.setAttribute('data-note', "");
-                          let p = c.parentElement;
-                          p.title = "";
-                          let corner = p.querySelector('.note-corner');
-                          if(corner) corner.remove();
-                      }
-                  });
-
+                  // Đã gỡ vòng lặp xóa chéo dữ liệu để đảm bảo "Khóa độc lập" hoạt động chuẩn xác
                   hks_input_el.value = hks_soMoi_num;
                   hks_input_el.setAttribute('data-note', hks_ghiChuMoi_str);
                   
@@ -918,7 +907,6 @@
                   if(corner) corner.remove();
               }
               
-              // Kích hoạt lại thuật toán khóa bảo vệ
               hks_dieuKhienOVuong_fn('#bang2', false);
           }
       });
