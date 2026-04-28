@@ -618,7 +618,6 @@
     }
   }
 
- // Cập nhật nguyên tắc: Thành tích luôn mở khi có quyền, Kết quả học tập khóa theo nhóm
  function hks_dieuKhienOVuong_fn(hks_danhDauBang_str, hks_voHieuHoa_bol) {
     const hks_bangDuLieuUI_el = document.querySelector(hks_danhDauBang_str);
     let hks_laQuanTriCapCao_bol = (hks_bienKhungHeThong_obj && hks_bienKhungHeThong_obj.hks_quyenTuyetDoi_bol === true);
@@ -637,18 +636,9 @@
                    let hks_tenNhom_str = hks_phanTuUI_el.name || "";
                    
                    if (hks_tenNhom_str.startsWith('tt_')) {
-                       // =======================================================
-                       // CÔNG TẮC BẢO VỆ PHÂN HỆ THÀNH TÍCH
-                       // Nếu muốn khóa các ô ĐÃ CÓ DỮ LIỆU: Mở comment 2 dòng dưới và comment dòng "disabled = false"
-                       // =======================================================
-                       // let hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
-                       // hks_phanTuUI_el.disabled = Boolean(hks_coDuLieu_bol);
-                       
-                       // Mã hiện tại: MỞ KHÓA HOÀN TOÀN ô thành tích
                        hks_phanTuUI_el.disabled = false;
 
                    } else if (hks_tenNhom_str.startsWith('kq_')) {
-                       // PHÂN HỆ KẾT QUẢ HỌC TẬP: Khóa theo nhóm an toàn
                        try {
                            const hks_nhomTap_arr = hks_bangDuLieuUI_el.querySelectorAll(`input[name="${hks_tenNhom_str}"]`);
                            let hks_nhomCoDuLieu_bol = Array.from(hks_nhomTap_arr).some(el => el.checked);
@@ -657,7 +647,6 @@
                            hks_phanTuUI_el.disabled = Boolean(hks_phanTuUI_el.checked);
                        }
                    } else {
-                       // Các trường hợp mặc định khác
                        let hks_coDuLieu_bol = false;
                        if (hks_phanTuUI_el.type === 'checkbox') hks_coDuLieu_bol = hks_phanTuUI_el.checked; 
                        else hks_coDuLieu_bol = hks_phanTuUI_el.value && String(hks_phanTuUI_el.value).trim() !== "";
@@ -856,7 +845,6 @@
     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
   }
 
- // Nâng cấp khối UI popup nhập thành tích (Đã gỡ thuật toán xóa loại trừ lẫn nhau)
   function hks_hienThiUINhapThanhTich_fn(hks_input_el, hks_dong_el, hks_nhom_num, hks_id_str) {
       let hks_giaTriHienTai_str = hks_input_el.value || "";
       let hks_ghiChuHienTai_str = hks_input_el.getAttribute('data-note') || "";
@@ -890,7 +878,6 @@
               let hks_ghiChuMoi_str = result.value.ghichu.trim();
 
               if (!isNaN(hks_soMoi_num) && hks_soMoi_num > 0) {
-                  // Đã gỡ vòng lặp xóa chéo dữ liệu để đảm bảo "Khóa độc lập" hoạt động chuẩn xác
                   hks_input_el.value = hks_soMoi_num;
                   hks_input_el.setAttribute('data-note', hks_ghiChuMoi_str);
                   
@@ -949,14 +936,13 @@
            }
            hks_theCot_el.appendChild(hks_theHopKiem_el);
         } else {
-           // Nâng cấp cơ chế hiển thị nhập liệu UI thành tích có ghi chú
            let hks_khungChua_el = document.createElement('div');
            hks_khungChua_el.style.position = 'relative';
            hks_khungChua_el.style.width = '100%';
            hks_khungChua_el.style.height = '100%';
 
            let hks_theNhapSo_el = document.createElement('input'); 
-           hks_theNhapSo_el.type = 'text'; // Giả lập ô number để chặn spinners, bắt buộc dùng popup
+           hks_theNhapSo_el.type = 'text';
            hks_theNhapSo_el.className = 'cell-input text-center fw-bold text-danger hks-input-thanhtich';
            hks_theNhapSo_el.readOnly = true;
            hks_theNhapSo_el.disabled = hks_voHieuHoa_bol;
@@ -964,7 +950,6 @@
            let hks_nhomThuTu_num = Math.floor((i - 27) / 4);
            hks_theNhapSo_el.name = `tt_${hks_nhomThuTu_num}_${hks_dongDuLieu_arr[2]}`;
            
-           // Trích xuất dữ liệu gốc đã lưu theo định dạng: Số|Ghi chú
            let hks_chuoiGoc_str = String(hks_dongDuLieu_arr[i] || "");
            let hks_giaTriSo_num = "";
            let hks_ghiChu_str = "";
@@ -985,7 +970,6 @@
                hks_khungChua_el.appendChild(hks_gocMau_el);
            }
 
-           // Mở UI giao diện khi nhấp vào ô (nếu có quyền sửa)
            hks_theNhapSo_el.onclick = function() {
                if(this.disabled) return;
                hks_hienThiUINhapThanhTich_fn(this, hks_theDong_el, hks_nhomThuTu_num, hks_dongDuLieu_arr[2]);
@@ -1014,14 +998,12 @@
       
       let hks_mangKetQuaLuu_arr = [hks_namChon_str, hks_lopChon_str, hks_truong1, hks_truong2, hks_truong3];
       for(let i=5; i < hks_theDong_el.cells.length; i++) {
-        // Cập nhật querySelector lấy element bên trong div container mới
         let hks_phanTuLayDuLieu_el = hks_theDong_el.cells[i].querySelector('input');
         
         if(hks_phanTuLayDuLieu_el.type === 'checkbox') {
             hks_mangKetQuaLuu_arr.push(hks_phanTuLayDuLieu_el.checked ? 'x' : '');
         } else {
             let hks_giaTri_str = hks_phanTuLayDuLieu_el.value;
-            // Xác định xem có phải là cột lưu thành tích hay không (Tính từ sau 8 cột kết quả HK1 & Cả Năm)
             if (i >= 13) {
                 let hks_ghiChu_str = hks_phanTuLayDuLieu_el.getAttribute('data-note');
                 if (hks_giaTri_str && String(hks_giaTri_str).trim() !== "" && hks_ghiChu_str && String(hks_ghiChu_str).trim() !== "") {
@@ -1054,17 +1036,22 @@
 
   function hks_dinhDangOChua_fn(val) { return val > 0 ? `<span class="has-val">${val}</span>` : `<span class="zero-val">0</span>`; }
 
+  // THUẬT TOÁN ĐÃ ĐƯỢC ĐỒNG BỘ CẤU TRÚC KÉP: { c: ..., n: [...] }
+  function hks_khoiTaoMauThanhTich_fn() {
+      return {1: {c:0, n:[]}, 2: {c:0, n:[]}, 3: {c:0, n:[]}, 4: {c:0, n:[]}};
+  }
+
   function hks_khoiTaoDoiTuong_fn(tenLop) {
       let obj = {
           lop: tenLop, tongSo: 0, danToc: 0, nu: 0, nuDanToc: 0, khuyetTat: 0, nuKhuyetTat: 0,
           ngheo: 0, canNgheo: 0, chinhSach: 0, bhyt: 0, htxs: 0, htt: 0, ht: 0, cht: 0,
-          tuoi: {}, thanhTich: { xa: {}, huyen: {}, tinh: {}, qg: {}, qt: {} }
+          tuoi: {}, thanhTich: { xa: hks_khoiTaoMauThanhTich_fn(), huyen: hks_khoiTaoMauThanhTich_fn(), tinh: hks_khoiTaoMauThanhTich_fn(), qg: hks_khoiTaoMauThanhTich_fn(), qt: hks_khoiTaoMauThanhTich_fn() }
       };
       for(let i=6; i<=19; i++) obj.tuoi[i] = {ts:0, nu:0};
-      ['xa','huyen','tinh','qg','qt'].forEach(cap => { for(let i=1; i<=4; i++) obj.thanhTich[cap][i] = 0; });
       return obj;
   }
 
+  // THUẬT TOÁN ĐÃ ĐƯỢC ĐỒNG BỘ: Nhận và Gộp Mảng Kép từ Back-end
   function hks_tinhTongGop_fn(goc, them) {
       goc.tongSo += them.tongSo || 0; goc.danToc += them.danToc || 0;
       goc.nu += them.nu || 0; goc.nuDanToc += them.nuDanToc || 0;
@@ -1077,8 +1064,23 @@
       for(let i=6; i<=19; i++) { 
           if(them.tuoi[i]) { goc.tuoi[i].ts += them.tuoi[i].ts || 0; goc.tuoi[i].nu += them.tuoi[i].nu || 0; }
       }
+      
       ['xa','huyen','tinh','qg','qt'].forEach(cap => {
-          for(let i=1; i<=4; i++) { if(them.thanhTich && them.thanhTich[cap]) goc.thanhTich[cap][i] += them.thanhTich[cap][i] || 0; }
+          for(let i=1; i<=4; i++) { 
+              if(them.thanhTich && them.thanhTich[cap] && them.thanhTich[cap][i] !== undefined) {
+                  let val = them.thanhTich[cap][i];
+                  if (typeof val === 'object' && val !== null) {
+                      goc.thanhTich[cap][i].c += val.c || 0;
+                      if (val.n && Array.isArray(val.n)) {
+                          val.n.forEach(note => {
+                              if (note && String(note).trim() !== '' && !goc.thanhTich[cap][i].n.includes(note)) {
+                                  goc.thanhTich[cap][i].n.push(note);
+                              }
+                          });
+                      }
+                  }
+              }
+          }
       });
   }
 
@@ -1107,6 +1109,30 @@
       </tr>`;
   }
 
+  // TÍNH NĂNG MỚI: Tự động vẽ Góc đỏ Note-Corner và Tooltip
+  function hks_taoTdThanhTich_fn(tt) {
+      if (!tt || tt.c === 0) return `<td class="col-compact"><span class="zero-val">0</span></td>`;
+
+      let val = tt.c;
+      let notes = tt.n || [];
+      let noteHtml = '';
+      let titleAttr = '';
+      
+      let filteredNotes = notes.filter(n => n && String(n).trim() !== '');
+      
+      if (filteredNotes.length > 0) {
+          // Định dạng từng dòng (&#10;) để hiển thị mượt mà trên Tooltip
+          let noteText = filteredNotes.join('&#10;').replace(/"/g, '&quot;');
+          titleAttr = `title="Ghi chú:&#10;${noteText}"`;
+          noteHtml = `<div class="note-corner"></div>`;
+      }
+      
+      return `<td class="col-compact" style="position: relative; cursor: pointer;" ${titleAttr}>
+          <span class="has-val">${val}</span>
+          ${noteHtml}
+      </td>`;
+  }
+
   function hks_taoGiaoDienChatLuong_fn(item, stt, cssClass, labelLop = null) {
       let hks_lopHienThi_str = labelLop ? labelLop : item.lop;
       return `<tr class="${cssClass}">
@@ -1117,26 +1143,26 @@
         <td class="col-compact">${hks_dinhDangOChua_fn(item.htt)}</td>
         <td class="col-compact">${hks_dinhDangOChua_fn(item.ht)}</td>
         <td class="col-compact">${hks_dinhDangOChua_fn(item.cht)}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.xa[1])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.xa[2])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.xa[3])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.xa[4])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.huyen[1])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.huyen[2])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.huyen[3])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.huyen[4])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.tinh[1])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.tinh[2])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.tinh[3])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.tinh[4])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qg[1])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qg[2])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qg[3])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qg[4])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qt[1])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qt[2])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qt[3])}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.thanhTich.qt[4])}</td>
+        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[1])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[2])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[3])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[4])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[1])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[2])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[3])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[4])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[1])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[2])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[3])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[4])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[1])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[2])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[3])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[4])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[1])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[2])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[3])}
+        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[4])}
       </tr>`;
   }
 
