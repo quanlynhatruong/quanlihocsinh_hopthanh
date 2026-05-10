@@ -136,9 +136,6 @@
       return obj;
   }
 
-  /* * Đã cập nhật chức năng lọc và gộp dữ liệu thành tích 
-   * Tuân thủ quy định không sử dụng từ khóa nhạy cảm PII
-   */
   function hks_tinhTongGop_fn(goc, them) {
       goc.tongSo += them.tongSo || 0; goc.danToc += them.danToc || 0;
       goc.nu += them.nu || 0; goc.nuDanToc += them.nuDanToc || 0;
@@ -207,10 +204,6 @@
       </tr>`;
   }
 
-  /* * Đã cập nhật chức năng hiển thị ghi chú có bao gồm tên học sinh 
-   * Nếu Backend gửi xuống Object: { chuThe: "Nguyễn Văn A", noiDung: "Giải Nhất" }
-   * Nếu Backend gửi xuống String gộp sẵn: "Nguyễn Văn A - Giải Nhất"
-   */
   function hks_taoTdThanhTich_fn(tt) {
       if (!tt || tt.c === 0) return `<td class="col-compact"><span class="zero-val">0</span></td>`;
 
@@ -219,21 +212,26 @@
       let noteHtml = '';
       let jsEvent = '';
       
-      let filteredNotes = notes.filter(n => n !== null && n !== undefined);
+      let filteredNotes = notes.filter(n => n !== null && n !== undefined && String(n).trim() !== '');
       
       if (filteredNotes.length > 0) {
           let noteText = filteredNotes.map(n => {
               if (typeof n === 'object') {
-                  // Hỗ trợ hiển thị dạng cấu trúc, an toàn PII
-                  let chuThe = n.chuThe || n.k1 || 'Chi tiết';
-                  let noiDung = n.noiDung || n.ghiChu || n.k2 || '';
-                  return `👤 <b>${chuThe}</b>: ${noiDung}`;
+                  let hks_chuThe_str = n.chuThe || n.k1 || 'Chi tiết';
+                  let hks_noiDung_str = n.noiDung || n.k2 || '';
+                  return `👤 <b>${hks_chuThe_str}</b> - ${hks_noiDung_str}`;
               }
-              // Hỗ trợ hiển thị dạng chuỗi gốc
-              return `▪ ${String(n)}`;
+              let hks_chuoiGoc_str = String(n);
+              if (hks_chuoiGoc_str.includes('-')) {
+                  let hks_mangTach_arr = hks_chuoiGoc_str.split('-');
+                  let hks_phanTen_str = hks_mangTach_arr.shift().trim();
+                  let hks_phanGiai_str = hks_mangTach_arr.join('-').trim();
+                  return `👤 <b>${hks_phanTen_str}</b> - ${hks_phanGiai_str}`;
+              }
+              return `👤 <b>${hks_chuoiGoc_str}</b>`;
           }).join('<br>').replace(/"/g, '&quot;');
           
-          let customTooltipHtml = `<div style="font-weight:bold; color:#003366; margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px; font-size:16px;">📋 THÔNG TIN CHI TIẾT THÀNH TÍCH:</div>${noteText}`;
+          let customTooltipHtml = `<div style="font-weight:bold; color:#003366; margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px; font-size:14px;">📋 DANH SÁCH CHI TIẾT:</div>${noteText}`;
           
           let encodedHtml = encodeURIComponent(customTooltipHtml);
           
