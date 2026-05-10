@@ -157,19 +157,8 @@
                       goc.thanhTich[cap][i].c += val.c || 0;
                       if (val.n && Array.isArray(val.n)) {
                           val.n.forEach(note => {
-                              if (note !== null && note !== undefined) {
-                                  let isDuplicate = false;
-                                  if (typeof note === 'object') {
-                                      isDuplicate = goc.thanhTich[cap][i].n.some(item => JSON.stringify(item) === JSON.stringify(note));
-                                  } else {
-                                      let noteStr = String(note).trim();
-                                      if (noteStr === '') return;
-                                      isDuplicate = goc.thanhTich[cap][i].n.includes(noteStr);
-                                  }
-                                  
-                                  if (!isDuplicate) {
-                                      goc.thanhTich[cap][i].n.push(typeof note === 'string' ? String(note).trim() : note);
-                                  }
+                              if (note && String(note).trim() !== '' && !goc.thanhTich[cap][i].n.includes(note)) {
+                                  goc.thanhTich[cap][i].n.push(note);
                               }
                           });
                       }
@@ -212,25 +201,21 @@
       let noteHtml = '';
       let jsEvent = '';
       
-      let filteredNotes = notes.filter(n => n !== null && n !== undefined && String(n).trim() !== '');
+      let filteredNotes = notes.filter(n => n && String(n).trim() !== '');
       
       if (filteredNotes.length > 0) {
+          // Bóc tách tên học sinh và giải thưởng dựa trên dấu " - " (nếu có)
           let noteText = filteredNotes.map(n => {
-              if (typeof n === 'object') {
-                  let hks_chuThe_str = n.chuThe || n.k1 || 'Chi tiết';
-                  let hks_noiDung_str = n.noiDung || n.k2 || '';
-                  return `👤 <b>${hks_chuThe_str}</b> - ${hks_noiDung_str}`;
-              }
               let hks_chuoiGoc_str = String(n);
-              if (hks_chuoiGoc_str.includes('-')) {
-                  let hks_mangTach_arr = hks_chuoiGoc_str.split('-');
-                  let hks_phanTen_str = hks_mangTach_arr.shift().trim();
-                  let hks_phanGiai_str = hks_mangTach_arr.join('-').trim();
-                  return `👤 <b>${hks_phanTen_str}</b> - ${hks_phanGiai_str}`;
+              let hks_viTriTach_num = hks_chuoiGoc_str.indexOf(' - ');
+              if (hks_viTriTach_num !== -1) {
+                  let hks_phanTen_str = hks_chuoiGoc_str.substring(0, hks_viTriTach_num).trim();
+                  let hks_phanGiai_str = hks_chuoiGoc_str.substring(hks_viTriTach_num + 3).trim();
+                  return `👤 <b>${hks_phanTen_str}</b>: ${hks_phanGiai_str}`;
               }
-              return `👤 <b>${hks_chuoiGoc_str}</b>`;
-          }).join('<br>').replace(/"/g, '&quot;');
-          
+              return `▪ ${hks_chuoiGoc_str}`;
+          }).join('<br>').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
           let customTooltipHtml = `<div style="font-weight:bold; color:#003366; margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px; font-size:14px;">📋 DANH SÁCH CHI TIẾT:</div>${noteText}`;
           
           let encodedHtml = encodeURIComponent(customTooltipHtml);
