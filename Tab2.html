@@ -76,6 +76,11 @@
       let hks_giaTriHienTai_str = hks_input_el.value || "";
       let hks_ghiChuHienTai_str = hks_input_el.getAttribute('data-note') || "";
 
+      // Trích xuất tự động danh xưng (họ tên) từ giao diện để chuẩn bị nối chuỗi
+      let hks_hoDem_str = hks_dong_el.cells[1].innerText.trim();
+      let hks_ten_str = hks_dong_el.cells[2].innerText.trim();
+      let hks_danhXung_str = (hks_hoDem_str + " " + hks_ten_str).trim();
+
       Swal.fire({
           title: '<h5 class="fw-bold text-danger text-uppercase mb-0 border-bottom border-danger pb-2">Hồ Sơ Thành Tích Học Sinh</h5>',
           html: `
@@ -105,6 +110,14 @@
               let hks_ghiChuMoi_str = result.value.ghichu.trim();
 
               if (!isNaN(hks_soMoi_num) && hks_soMoi_num > 0) {
+                  
+                  // BỔ SUNG: Tự động đính kèm tên học sinh vào ghi chú nếu chưa có
+                  if (hks_ghiChuMoi_str !== "" && hks_danhXung_str !== "") {
+                      if (!hks_ghiChuMoi_str.includes(hks_danhXung_str)) {
+                          hks_ghiChuMoi_str = hks_danhXung_str + " - " + hks_ghiChuMoi_str;
+                      }
+                  }
+
                   hks_input_el.value = hks_soMoi_num;
                   hks_input_el.setAttribute('data-note', hks_ghiChuMoi_str);
                   
