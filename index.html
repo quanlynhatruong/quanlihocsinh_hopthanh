@@ -191,6 +191,8 @@
   function applyHKSConfig() {
       if(typeof HKS_LINK_LOGO !== 'undefined') {
           document.querySelectorAll('.app-logo, .gate-logo').forEach(img => { img.src = HKS_LINK_LOGO; img.style.display = 'inline-block'; });
+          let fav = document.getElementById('page_favicon');
+          if(fav) fav.href = HKS_LINK_LOGO;
       }
       if(typeof HKS_TEN_PM_UP !== 'undefined') {
           const h2Gate = document.getElementById('ui_ten_pm');
