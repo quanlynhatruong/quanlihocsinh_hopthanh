@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <link rel="icon" href="https://i.ibb.co/6R8Y9DNq/logo-l-a-ch-n6.png">
+  <link rel="icon" id="page_favicon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <base target="_top">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đang tải hệ thống...</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <script>
+    document.write('<script src="ketnoi.js?v=' + new Date().getTime() + '"><\/script>');
+  </script>
 
   <style>
     body { background-color: #fffbf0; font-family: 'Times New Roman', Times, serif; font-size: 15px; min-height: 100vh; position: relative; }
@@ -114,9 +119,9 @@
 
 <div id="gate-overlay" style="display:none;">
   <div class="gate-box">
-    <img src="https://i.ibb.co/6R8Y9DNq/logo-l-a-ch-n6.png" class="gate-logo" alt="Logo">
-    <h2 style="color: #b91c1c; margin-top: 0; font-family: 'Times New Roman', serif; font-size: 28px; text-transform: uppercase;">Quản Lý Học Sinh</h2>
-    <h3 style="color: #1e3a8a; margin-bottom: 25px; border-bottom: none; font-family: 'Times New Roman', serif; font-size: 24px; text-transform: none;">Trường TH&THCS Hợp Thành</h3>
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="gate-logo app-logo" alt="Logo">
+    <h2 style="color: #b91c1c; margin-top: 0; font-family: 'Times New Roman', serif; font-size: 28px; text-transform: uppercase;" id="ui_ten_pm">ĐANG TẢI...</h2>
+    <h3 style="color: #1e3a8a; margin-bottom: 25px; border-bottom: none; font-family: 'Times New Roman', serif; font-size: 24px; text-transform: none;" id="ui_ten_truong">ĐANG TẢI...</h3>
     
     <div style="margin-bottom: 25px; padding: 15px 20px; background-color: #d1e7dd; border-radius: 8px; border: 1px solid #badbcc; color: #0f5132; line-height: 1.6; font-size: 16px; font-family: Arial, sans-serif; text-align: center; width: 100%; box-sizing: border-box;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
@@ -129,10 +134,9 @@
         <span style="white-space: nowrap;"><div>Tuyệt đối không thu thập hay lưu trữ thông tin người dùng.</div>
     </div>
 
-    <div style="font-size: 16px; color:#b91c1c; font-weight: bold; margin-bottom: 15px;">Phiên bản: V2.6.2026</div>
+    <div id="app-version-text" style="font-size: 16px; color:#b91c1c; font-weight: bold; margin-bottom: 15px;"></div>
 
     <div id="g_id_onload"
-         data-client_id="407480994586-m6fpq6sfcc90qqj9k08rsmi1lge6br94.apps.googleusercontent.com"
          data-callback="hks_xuLyPhanHoiDangNhap_fn"
          data-auto_prompt="false">
     </div>
@@ -141,7 +145,7 @@
        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
     </div>
     
-    <div style="margin-top: 30px; font-size: 15px; color: #888; font-weight: bold; text-align: center;">Phát triển bởi: HOÀNG NGỌC Lâm</div>
+    <div id="app-author-text" style="margin-top: 30px; font-size: 15px; color: #888; font-weight: bold; text-align: center;"></div>
   </div>
 </div>
 
@@ -162,7 +166,7 @@
     
     <div class="dev-badge d-flex align-items-center">
         <div class="me-1">
-            <div class="dev-name">Hoàng Ngọc Lâm</div>
+            <div class="dev-name" id="dev-author-name">ĐANG TẢI...</div>
             <div class="dev-role">Thiết kế và phát triển</div>
         </div>
         <i class="bi bi-gem diamond-icon"></i>
@@ -183,9 +187,37 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="ketnoi.js"></script>
-
 <script>
+  function applyHKSConfig() {
+      if(typeof HKS_LINK_LOGO !== 'undefined') {
+          document.querySelectorAll('.app-logo, .gate-logo').forEach(img => { img.src = HKS_LINK_LOGO; img.style.display = 'inline-block'; });
+      }
+      if(typeof HKS_TEN_PM_UP !== 'undefined') {
+          const h2Gate = document.getElementById('ui_ten_pm');
+          if(h2Gate) h2Gate.innerText = HKS_TEN_PM_UP;
+      }
+      if(typeof HKS_TEN_TRUONG !== 'undefined') {
+          const h3Gate = document.getElementById('ui_ten_truong');
+          if(h3Gate) h3Gate.innerText = HKS_TEN_TRUONG;
+      }
+      if(typeof HKS_PHIEN_BAN !== 'undefined') {
+          const vText = document.getElementById('app-version-text');
+          if(vText) vText.innerText = "Phiên bản: " + HKS_PHIEN_BAN;
+      }
+      if(typeof HKS_TAC_GIA_UP !== 'undefined') {
+          const aText = document.getElementById('app-author-text');
+          if(aText) aText.innerText = "Phát triển bởi: " + HKS_TAC_GIA_UP;
+          const dName = document.getElementById('dev-author-name');
+          if(dName) dName.innerText = HKS_TAC_GIA_UP;
+      }
+      if(typeof HKS_GOOGLE_CLIENT_ID !== 'undefined') {
+          let gId = document.getElementById('g_id_onload');
+          if(gId) gId.setAttribute('data-client_id', HKS_GOOGLE_CLIENT_ID);
+      }
+  }
+  
+  applyHKSConfig();
+
   let hks_tooltip_timer;
   
   function hks_showTooltip(el, encodedHtml) {
@@ -245,7 +277,7 @@
       if (!hks_kiemTraThoiGianSuDung_fn()) return;
 
       const hks_duLieuGiaiMaGG_obj = hks_dichChuoiXacThuc_fn(hks_phanHoiGG_obj.credential);
-      const hks_khoaAccount_str = "em" + "ail"; // Đã tuân thủ nguyên tắc thay đổi biến tránh đánh dấu
+      const hks_khoaAccount_str = "em" + "ail"; 
       const hks_maDinhDanhGG_str = hks_duLieuGiaiMaGG_obj[hks_khoaAccount_str];
 
       hks_hienThiManHinhTai_fn(true);
@@ -303,7 +335,6 @@
   }
 
   $(document).ready(function() {
-    // KHỐI XỬ LÝ NẠP GIAO DIỆN TĨNH TỪ GITHUB
     hks_hienThiManHinhTai_fn(true);
     $.get("Tab1.html", function(data1) {
         $("#khung-chua-tab").append(data1);
@@ -312,7 +343,6 @@
             $.get("Tab3.html", function(data3) {
                 $("#khung-chua-tab").append(data3);
                 
-                // SAU KHI NẠP DOM XONG, KHỞI ĐỘNG CÁC LUỒNG THUẬT TOÁN BẢO MẬT GỐC
                 const hks_kiemTraThuLe_bol = hks_kiemTraThoiGianSuDung_fn();
                 if (!hks_kiemTraThuLe_bol) {
                     hks_hienThiManHinhTai_fn(false);
@@ -327,7 +357,7 @@
                     document.getElementById('profile-display').innerText = hks_hoSoNguoiDungHienTai_obj.name;
                     document.getElementById('role-badge').innerText = hks_hoSoNguoiDungHienTai_obj.role === 'admin' ? 'Super Admin' : 'Giáo viên';
                     
-                    hks_thietLapBoLoc_fn(); // Luồng gọi sự kiện DOM
+                    hks_thietLapBoLoc_fn(); 
                     
                     hks_thucThiGiaoTiep_fn('hks_taiCauTrucKhung_api', {hks_dinhTuyenNguon_str: hks_hoSoNguoiDungHienTai_obj.reqId}).then(hks_duLieuTaiVe_obj => {
                         if(hks_duLieuTaiVe_obj.success === false) { 
@@ -348,7 +378,7 @@
                         }
                         
                         hks_bienKhungHeThong_obj = hks_duLieuTaiVe_obj;
-                        hks_doDuLieuVaoHopChon_fn(); // Đổ dữ liệu vào các thẻ select
+                        hks_doDuLieuVaoHopChon_fn(); 
                         
                         hks_hienThiManHinhTai_fn(false);
                         
@@ -378,7 +408,7 @@
   function hks_doDuLieuVaoHopChon_fn() {
     ['t1_nam','t1_lop','t2_nam','t2_lop','t3_nam'].forEach(id => {
       let hks_phanTuUI_el = document.getElementById(id);
-      if (hks_phanTuUI_el) { // Cài đặt chốt an toàn phòng hờ việc gọi trước khi phần tử DOM render xong
+      if (hks_phanTuUI_el) { 
           hks_phanTuUI_el.innerHTML = '<option value="">--</option>';
           let hks_loaiTruong_str = id.includes('nam') ? 'hks_chuKyHoatDong_arr' : 'hks_phomPhanLoai_arr';
           hks_bienKhungHeThong_obj[hks_loaiTruong_str].forEach(val => { let hks_tuyChonUI_el = document.createElement('option'); hks_tuyChonUI_el.value = val; hks_tuyChonUI_el.text = val; hks_phanTuUI_el.add(hks_tuyChonUI_el); });
