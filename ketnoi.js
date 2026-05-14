@@ -15,18 +15,24 @@ var HKS_MO_TA = "Hệ thống quản lý thông tin học sinh nội bộ - " + 
 /* KHỞI TẠO CẤU TRÚC HEADER TỰ ĐỘNG TỪ FILE JS                               */
 /* ========================================================================= */
 (function() {
-    var metaDesc = document.createElement('meta');
-    metaDesc.name = "description";
+    var metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = "description";
+        document.head.appendChild(metaDesc);
+    }
     metaDesc.content = HKS_MO_TA;
-    document.head.appendChild(metaDesc);
     
     document.title = HKS_TEN_PM + " - " + HKS_TEN_TRUONG;
     
-    var linkIcon = document.createElement('link');
-    linkIcon.rel = 'icon';
-    linkIcon.id = 'page_favicon';
+    var linkIcon = document.getElementById('page_favicon');
+    if (!linkIcon) {
+        linkIcon = document.createElement('link');
+        linkIcon.rel = 'icon';
+        linkIcon.id = 'page_favicon';
+        document.head.appendChild(linkIcon);
+    }
     linkIcon.href = HKS_LINK_LOGO;
-    document.head.appendChild(linkIcon);
 })();
 
 // --- HÀM KẾT NỐI API CHUNG ---
