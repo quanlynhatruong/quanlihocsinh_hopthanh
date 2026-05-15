@@ -422,13 +422,16 @@ async function hks_capNhatBoNhoDem_fn() {
                         }
                         
                         hks_bienKhungHeThong_obj = hks_duLieuTaiVe_obj;
-                        hks_doDuLieuVaoHopChon_fn(); 
-                        
-                        hks_hienThiManHinhTai_fn(false);
-                        
-                        let hks_ungDungChinh_el = document.getElementById('main-app');
-                        hks_ungDungChinh_el.style.display = 'block';
-                        setTimeout(() => { hks_ungDungChinh_el.style.opacity = '1'; }, 50);
+hks_doDuLieuVaoHopChon_fn(); // Đổ dữ liệu vào các thẻ select
+
+// SỬA LỖI: Buộc hệ thống nạp lại bộ nhớ đệm trước khi mở giao diện
+hks_capNhatBoNhoDem_fn().then(() => {
+    hks_hienThiManHinhTai_fn(false);
+    
+    let hks_ungDungChinh_el = document.getElementById('main-app');
+    hks_ungDungChinh_el.style.display = 'block';
+    setTimeout(() => { hks_ungDungChinh_el.style.opacity = '1'; }, 50);
+});
                         
                     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
                 } else {
