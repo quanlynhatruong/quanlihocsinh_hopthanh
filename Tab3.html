@@ -115,12 +115,7 @@
     hks_hienThiManHinhTai_fn(true);
     
     hks_thucThiGiaoTiep_fn('hks_tongHopBaoCaoDich_api', {hks_chuKyHoatDong_str: hks_namChon_str, hks_dinhTuyenNguon_str: hks_hoSoNguoiDungHienTai_obj.reqId}).then(hks_ketQuaAPI_obj => {
-        // SỬA LỖI BẢO MẬT: Nhả thông báo lỗi gốc để dễ dàng tìm lỗi bảo trì, tránh che đậy mọi lỗi bằng câu lệnh từ chối quyền
-        if(hks_ketQuaAPI_obj.success === false) { 
-            Swal.fire('Lỗi trích xuất', hks_ketQuaAPI_obj.message || 'Không đủ quyền biên dịch mảng!', 'warning'); 
-            hks_hienThiManHinhTai_fn(false); 
-            return; 
-        }
+        if(hks_ketQuaAPI_obj.success === false) { Swal.fire('Từ chối', hks_ketQuaAPI_obj.message || 'Lỗi trích xuất!', 'warning'); hks_hienThiManHinhTai_fn(false); return; }
         hks_veBangPhanBa_fn(hks_ketQuaAPI_obj.data);
     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
   }
@@ -209,7 +204,6 @@
       let filteredNotes = notes.filter(n => n && String(n).trim() !== '');
       
       if (filteredNotes.length > 0) {
-          // Bóc tách tên học sinh và giải thưởng dựa trên dấu " - " (nếu có)
           let noteText = filteredNotes.map(n => {
               let hks_chuoiGoc_str = String(n);
               let hks_viTriTach_num = hks_chuoiGoc_str.indexOf(' - ');
@@ -222,9 +216,7 @@
           }).join('<br>').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
           let customTooltipHtml = `<div style="font-weight:bold; color:#003366; margin-bottom:8px; border-bottom:1px dashed #ccc; padding-bottom:5px; font-size:14px;">📋 DANH SÁCH CHI TIẾT:</div>${noteText}`;
-          
           let encodedHtml = encodeURIComponent(customTooltipHtml);
-          
           jsEvent = `onmouseenter="hks_showTooltip(this, '${encodedHtml}')" onmouseleave="hks_hideTooltip()"`;
           noteHtml = `<div class="note-corner"></div>`;
       }
