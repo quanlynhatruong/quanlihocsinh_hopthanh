@@ -52,7 +52,8 @@
 </div>
 
 <script>
-function hks_layDuLieuPhanHai_fn() {
+  // HÀM TÌM KIẾM TỨC THỜI (DÙNG CACHE)
+  function hks_layDuLieuPhanHai_fn() {
     hks_hienThiManHinhTai_fn(true);
     let n = document.getElementById('t2_nam').value;
     let l = document.getElementById('t2_lop').value;
@@ -60,9 +61,16 @@ function hks_layDuLieuPhanHai_fn() {
     let h = document.getElementById('t2_hodem').value.trim().toLowerCase();
     let t = document.getElementById('t2_ten').value.trim().toLowerCase();
 
+    let khoa = `${n}_${l}`;
+    let isAll = hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr?.includes('ALL');
+    let canEdit = isAll || hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr?.includes(khoa);
+    
+    if(canEdit) document.getElementById('btnEdit2').style.display = 'inline-block';
+    else document.getElementById('btnEdit2').style.display = 'none';
+    
     hks_khoiPhucTrangThaiGoc_fn(2);
-
-    // TÌM KIẾM TỨC THỜI
+    
+    // Lọc tức thời từ hks_khoDuLieuTong_arr
     let kq = hks_khoDuLieuTong_arr.filter(r => {
         let matchNam = n ? String(r[0]) == n : true;
         let matchLop = l ? String(r[1]) == l : true;
@@ -71,16 +79,14 @@ function hks_layDuLieuPhanHai_fn() {
         let matchT = t ? String(r[4]).toLowerCase().includes(t) : true;
         return matchNam && matchLop && matchC && matchH && matchT;
     });
-
+    
     hks_veBangPhanHai_fn(kq);
-    hks_hienThiManHinhTai_fn(false);
-}
+  }
 
   function hks_hienThiUINhapThanhTich_fn(hks_input_el, hks_dong_el, hks_nhom_num, hks_id_str) {
       let hks_giaTriHienTai_str = hks_input_el.value || "";
       let hks_ghiChuHienTai_str = hks_input_el.getAttribute('data-note') || "";
 
-      // Trích xuất tự động danh xưng (họ tên) từ giao diện để chuẩn bị nối chuỗi
       let hks_hoDem_str = hks_dong_el.cells[1].innerText.trim();
       let hks_ten_str = hks_dong_el.cells[2].innerText.trim();
       let hks_danhXung_str = (hks_hoDem_str + " " + hks_ten_str).trim();
@@ -94,7 +100,7 @@ function hks_layDuLieuPhanHai_fn() {
               </div>
               <div class="text-start">
                   <label class="fw-bold mb-1" style="color:#003366; font-size:14px;"><i class="bi bi-card-text text-info"></i> Thông tin minh chứng (Tên cuộc thi):</label>
-                  <textarea id="swal-input-ghichu" class="form-control" rows="7" placeholder="Nhập tên cuộc thi, hội thi, sân chơi, số quyết định công nhận giải.\n VD:\n - Giải nhất cuộc thi Trạng nguyên tiếng Việt. Quyết định số 06/QD-BTC, ngày 25/4/2026.\n - Giải nhất đấu trường toán học VioEdu. Quyết định số 08/QĐ-BTC, ngày 26/4/2026.\n...">${hks_ghiChuHienTai_str}</textarea>
+                  <textarea id="swal-input-ghichu" class="form-control" rows="7" placeholder="Nhập tên cuộc thi...">${hks_ghiChuHienTai_str}</textarea>
               </div> `,
           showCancelButton: true,
           confirmButtonText: '<i class="bi bi-check-circle"></i> Lưu thông tin',
@@ -103,10 +109,7 @@ function hks_layDuLieuPhanHai_fn() {
           cancelButtonColor: '#6c757d',
           focusConfirm: false,
           preConfirm: () => {
-              return {
-                  so: document.getElementById('swal-input-so').value,
-                  ghichu: document.getElementById('swal-input-ghichu').value
-              }
+              return { so: document.getElementById('swal-input-so').value, ghichu: document.getElementById('swal-input-ghichu').value }
           }
       }).then((result) => {
           if (result.isConfirmed) {
@@ -114,14 +117,9 @@ function hks_layDuLieuPhanHai_fn() {
               let hks_ghiChuMoi_str = result.value.ghichu.trim();
 
               if (!isNaN(hks_soMoi_num) && hks_soMoi_num > 0) {
-                  
-                  // BỔ SUNG: Tự động đính kèm tên học sinh vào ghi chú nếu chưa có
-                  if (hks_ghiChuMoi_str !== "" && hks_danhXung_str !== "") {
-                      if (!hks_ghiChuMoi_str.includes(hks_danhXung_str)) {
-                          hks_ghiChuMoi_str = hks_danhXung_str + " - " + hks_ghiChuMoi_str;
-                      }
+                  if (hks_ghiChuMoi_str !== "" && !hks_ghiChuMoi_str.includes(hks_danhXung_str)) {
+                      hks_ghiChuMoi_str = hks_danhXung_str + " - " + hks_ghiChuMoi_str;
                   }
-
                   hks_input_el.value = hks_soMoi_num;
                   hks_input_el.setAttribute('data-note', hks_ghiChuMoi_str);
                   
@@ -133,10 +131,6 @@ function hks_layDuLieuPhanHai_fn() {
                           hks_gocMau_el.className = 'note-corner';
                           hks_khung_el.appendChild(hks_gocMau_el);
                       }
-                  } else {
-                      hks_khung_el.title = "";
-                      let corner = hks_khung_el.querySelector('.note-corner');
-                      if(corner) corner.remove();
                   }
               } else {
                   hks_input_el.value = "";
@@ -146,7 +140,6 @@ function hks_layDuLieuPhanHai_fn() {
                   let corner = hks_khung_el.querySelector('.note-corner');
                   if(corner) corner.remove();
               }
-              
               hks_dieuKhienOVuong_fn('#bang2', false);
           }
       });
@@ -167,7 +160,6 @@ function hks_layDuLieuPhanHai_fn() {
         if (i >= 19 && i <= 26) {
            let hks_theHopKiem_el = document.createElement('input'); hks_theHopKiem_el.type = 'checkbox'; 
            hks_theHopKiem_el.disabled = hks_voHieuHoa_bol;
-    
            if(String(hks_dongDuLieu_arr[i]).toLowerCase() === 'x') hks_theHopKiem_el.checked = true;
            
            if(i >= 19 && i <= 22) {
@@ -181,22 +173,17 @@ function hks_layDuLieuPhanHai_fn() {
            hks_theCot_el.appendChild(hks_theHopKiem_el);
         } else {
            let hks_khungChua_el = document.createElement('div');
-           hks_khungChua_el.style.position = 'relative';
-           hks_khungChua_el.style.width = '100%';
-           hks_khungChua_el.style.height = '100%';
+           hks_khungChua_el.style.position = 'relative'; hks_khungChua_el.style.width = '100%'; hks_khungChua_el.style.height = '100%';
 
            let hks_theNhapSo_el = document.createElement('input'); 
-           hks_theNhapSo_el.type = 'text';
-           hks_theNhapSo_el.className = 'cell-input text-center fw-bold text-danger hks-input-thanhtich';
-           hks_theNhapSo_el.readOnly = true;
-           hks_theNhapSo_el.disabled = hks_voHieuHoa_bol;
+           hks_theNhapSo_el.type = 'text'; hks_theNhapSo_el.className = 'cell-input text-center fw-bold text-danger hks-input-thanhtich';
+           hks_theNhapSo_el.readOnly = true; hks_theNhapSo_el.disabled = hks_voHieuHoa_bol;
            
            let hks_nhomThuTu_num = Math.floor((i - 27) / 4);
            hks_theNhapSo_el.name = `tt_${hks_nhomThuTu_num}_${hks_dongDuLieu_arr[2]}`;
            
            let hks_chuoiGoc_str = String(hks_dongDuLieu_arr[i] || "");
-           let hks_giaTriSo_num = "";
-           let hks_ghiChu_str = "";
+           let hks_giaTriSo_num = ""; let hks_ghiChu_str = "";
            if(hks_chuoiGoc_str && hks_chuoiGoc_str !== "undefined" && hks_chuoiGoc_str !== "null") {
                let hks_mangTach_arr = hks_chuoiGoc_str.split('|');
                let hks_soTam_num = parseInt(hks_mangTach_arr[0]);
@@ -204,25 +191,18 @@ function hks_layDuLieuPhanHai_fn() {
                if(hks_mangTach_arr.length > 1) hks_ghiChu_str = hks_mangTach_arr[1];
            }
 
-           hks_theNhapSo_el.value = hks_giaTriSo_num;
-           hks_theNhapSo_el.setAttribute('data-note', hks_ghiChu_str);
+           hks_theNhapSo_el.value = hks_giaTriSo_num; hks_theNhapSo_el.setAttribute('data-note', hks_ghiChu_str);
 
            if(hks_ghiChu_str) {
                hks_khungChua_el.title = "Thông tin:\n" + hks_ghiChu_str;
-               let hks_gocMau_el = document.createElement('div');
-               hks_gocMau_el.className = 'note-corner';
+               let hks_gocMau_el = document.createElement('div'); hks_gocMau_el.className = 'note-corner';
                hks_khungChua_el.appendChild(hks_gocMau_el);
            }
 
-           hks_theNhapSo_el.onclick = function() {
-               if(this.disabled) return;
-               hks_hienThiUINhapThanhTich_fn(this, hks_theDong_el, hks_nhomThuTu_num, hks_dongDuLieu_arr[2]);
-           };
-
+           hks_theNhapSo_el.onclick = function() { if(this.disabled) return; hks_hienThiUINhapThanhTich_fn(this, hks_theDong_el, hks_nhomThuTu_num, hks_dongDuLieu_arr[2]); };
            hks_khungChua_el.appendChild(hks_theNhapSo_el);
            hks_theCot_el.appendChild(hks_khungChua_el);
         }
-
         hks_theDong_el.appendChild(hks_theCot_el);
       }
       hks_thanBang_el.appendChild(hks_theDong_el);
@@ -243,7 +223,6 @@ function hks_layDuLieuPhanHai_fn() {
       let hks_mangKetQuaLuu_arr = [hks_namChon_str, hks_lopChon_str, hks_truong1, hks_truong2, hks_truong3];
       for(let i=5; i < hks_theDong_el.cells.length; i++) {
         let hks_phanTuLayDuLieu_el = hks_theDong_el.cells[i].querySelector('input');
-        
         if(hks_phanTuLayDuLieu_el.type === 'checkbox') {
             hks_mangKetQuaLuu_arr.push(hks_phanTuLayDuLieu_el.checked ? 'x' : '');
         } else {
@@ -263,7 +242,13 @@ function hks_layDuLieuPhanHai_fn() {
     
     hks_thucThiGiaoTiep_fn('hks_ghiNhanPhanHeHai_api', {hks_mangDuLieuDauVao_arr: hks_duLieuCanLuu_arr, hks_dinhTuyenNguon_str: hks_hoSoNguoiDungHienTai_obj.reqId}).then(hks_ketQuaAPI_obj => { 
         if(hks_ketQuaAPI_obj.success === false) { Swal.fire('Từ chối', 'Không có tín hiệu lưu trữu!', 'warning'); hks_hienThiManHinhTai_fn(false); return; }
-        Swal.fire("Hoàn tất", hks_ketQuaAPI_obj.message, "success"); hks_khoiPhucTrangThaiGoc_fn(2); hks_hienThiManHinhTai_fn(false); 
+        
+        // SỬA LỖI: Cập nhật bộ nhớ đệm RAM sau khi lưu
+        hks_capNhatBoNhoDem_fn().then(() => {
+            Swal.fire("Hoàn tất", hks_ketQuaAPI_obj.message, "success"); 
+            hks_khoiPhucTrangThaiGoc_fn(2); 
+            hks_hienThiManHinhTai_fn(false); 
+        });
     }).catch(e => { Swal.fire('Sự cố kết nối', e.message, 'warning'); hks_hienThiManHinhTai_fn(false); });
   }
 </script>
