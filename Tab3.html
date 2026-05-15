@@ -219,7 +219,7 @@
       return hks_ketQuaCuoi_arr;
   }
 
-  // HÀM GỌI BÁO CÁO (ĐÃ LOẠI BỎ Gọi API SERVER)
+  // HÀM GỌI BÁO CÁO 
   function hks_layDuLieuPhanBa_fn() {
     let hks_namChon_str = document.getElementById('t3_nam').value;
     if(!hks_namChon_str) { Swal.fire("Cảnh báo!", "Giá trị trục gốc bằng null!", "warning"); return; }
@@ -229,7 +229,7 @@
     setTimeout(() => {
         let hks_ketQuaThongKe_arr = hks_xuLyThongKeBoNhoDem_fn(hks_namChon_str);
         hks_veBangPhanBa_fn(hks_ketQuaThongKe_arr);
-    }, 50); // Timeout nhỏ để nhường luồng render icon loading
+    }, 50); 
   }
 
   function hks_dinhDangOChua_fn(val) { return val > 0 ? `<span class="has-val">${val}</span>` : `<span class="zero-val">0</span>`; }
@@ -341,44 +341,16 @@
       </td>`;
   }
 
-  function hks_taoGiaoDienChatLuong_fn(item, stt, cssClass, labelLop = null) {
-      let hks_lopHienThi_str = labelLop ? labelLop : item.lop;
-      return `<tr class="${cssClass}">
-        <td>${stt}</td>
-        <td class="fw-bold text-start px-2 ${cssClass === '' ? 'text-primary' : ''}">${hks_lopHienThi_str}</td>
-        <td class="col-compact fw-bold">${hks_dinhDangOChua_fn(item.tongSo)}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.htxs)}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.htt)}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.ht)}</td>
-        <td class="col-compact">${hks_dinhDangOChua_fn(item.cht)}</td>
-        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[1])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[2])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[3])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.xa[4])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[1])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[2])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[3])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.huyen[4])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[1])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[2])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[3])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.tinh[4])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[1])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[2])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[3])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qg[4])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[1])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[2])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[3])}
-        ${hks_taoTdThanhTich_fn(item.thanhTich.qt[4])}
-      </tr>`;
-  }
-
+  // --- HÀM TỐI ƯU HÓA RENDER: NỐI CHUỖI ẢO TRƯỚC KHI VẼ ---
   function hks_veBangPhanBa_fn(data) {
     const hks_bangTH_el = document.querySelector('#bang3_1 tbody');
     const hks_bangTHCS_el = document.querySelector('#bang3_1_thcs tbody');
     const hks_bangCL_el = document.querySelector('#bang3_2 tbody');
-    hks_bangTH_el.innerHTML = ''; hks_bangTHCS_el.innerHTML = ''; hks_bangCL_el.innerHTML = '';
+    
+    // Biến lưu trữ chuỗi HTML ảo để tăng tốc render DOM
+    let hks_chuoiHtmlTH_str = '';
+    let hks_chuoiHtmlTHCS_str = '';
+    let hks_chuoiHtmlCL_str = '';
     
     let hks_tongToanTruong_obj = data.find(item => item.lop === 'TỔNG');
     let hks_danhSachLopThongKe_arr = data.filter(item => item.lop !== 'TỔNG');
@@ -398,9 +370,9 @@
 
         if (hks_khoiDangXet_num !== null && hks_khoiLop_num !== hks_khoiDangXet_num) {
             let hks_daLaCapMot_bol = (hks_khoiDangXet_num >= 1 && hks_khoiDangXet_num <= 5);
-            if (hks_daLaCapMot_bol) hks_bangTH_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'TH');
-            else hks_bangTHCS_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'THCS');
-            hks_bangCL_el.innerHTML += hks_taoGiaoDienChatLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`);
+            if (hks_daLaCapMot_bol) hks_chuoiHtmlTH_str += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'TH');
+            else hks_chuoiHtmlTHCS_str += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'THCS');
+            hks_chuoiHtmlCL_str += hks_taoGiaoDienChatLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`);
             hks_tongTungKhoi_obj = null;
         }
 
@@ -413,21 +385,26 @@
         if (hks_laCapMot_bol) hks_tinhTongGop_fn(hks_tongCapMot_obj, item);
         else if (hks_laCapHai_bol) hks_tinhTongGop_fn(hks_tongCapHai_obj, item);
 
-        if (hks_laCapMot_bol) hks_bangTH_el.innerHTML += hks_taoGiaoDienSoLuong_fn(item, hks_soThuTuMot_num++, '', null, 'TH');
-        else if (hks_laCapHai_bol) hks_bangTHCS_el.innerHTML += hks_taoGiaoDienSoLuong_fn(item, hks_soThuTuHai_num++, '', null, 'THCS');
-        hks_bangCL_el.innerHTML += hks_taoGiaoDienChatLuong_fn(item, hks_soThuTuBa_num++, '', null);
+        if (hks_laCapMot_bol) hks_chuoiHtmlTH_str += hks_taoGiaoDienSoLuong_fn(item, hks_soThuTuMot_num++, '', null, 'TH');
+        else if (hks_laCapHai_bol) hks_chuoiHtmlTHCS_str += hks_taoGiaoDienSoLuong_fn(item, hks_soThuTuHai_num++, '', null, 'THCS');
+        hks_chuoiHtmlCL_str += hks_taoGiaoDienChatLuong_fn(item, hks_soThuTuBa_num++, '', null);
     });
 
     if (hks_tongTungKhoi_obj !== null) {
         let hks_daLaCapMot_bol = (hks_khoiDangXet_num >= 1 && hks_khoiDangXet_num <= 5);
-        if (hks_daLaCapMot_bol) hks_bangTH_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'TH');
-        else hks_bangTHCS_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'THCS');
-        hks_bangCL_el.innerHTML += hks_taoGiaoDienChatLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`);
+        if (hks_daLaCapMot_bol) hks_chuoiHtmlTH_str += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'TH');
+        else hks_chuoiHtmlTHCS_str += hks_taoGiaoDienSoLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`, 'THCS');
+        hks_chuoiHtmlCL_str += hks_taoGiaoDienChatLuong_fn(hks_tongTungKhoi_obj, '', 'row-grade-total', `Cộng Khối ${hks_khoiDangXet_num}`);
     }
 
-    if(hks_tongCapMot_obj.tongSo > 0) hks_bangTH_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongCapMot_obj, '', 'row-total', null, 'TH');
-    if(hks_tongCapHai_obj.tongSo > 0) hks_bangTHCS_el.innerHTML += hks_taoGiaoDienSoLuong_fn(hks_tongCapHai_obj, '', 'row-total', null, 'THCS');
-    if (hks_tongToanTruong_obj) hks_bangCL_el.innerHTML += hks_taoGiaoDienChatLuong_fn(hks_tongToanTruong_obj, '', 'row-total', null);
+    if(hks_tongCapMot_obj.tongSo > 0) hks_chuoiHtmlTH_str += hks_taoGiaoDienSoLuong_fn(hks_tongCapMot_obj, '', 'row-total', null, 'TH');
+    if(hks_tongCapHai_obj.tongSo > 0) hks_chuoiHtmlTHCS_str += hks_taoGiaoDienSoLuong_fn(hks_tongCapHai_obj, '', 'row-total', null, 'THCS');
+    if (hks_tongToanTruong_obj) hks_chuoiHtmlCL_str += hks_taoGiaoDienChatLuong_fn(hks_tongToanTruong_obj, '', 'row-total', null);
+
+    // Gán đồng loạt 1 lần duy nhất để tối ưu tốc độ render
+    hks_bangTH_el.innerHTML = hks_chuoiHtmlTH_str;
+    hks_bangTHCS_el.innerHTML = hks_chuoiHtmlTHCS_str;
+    hks_bangCL_el.innerHTML = hks_chuoiHtmlCL_str;
 
     hks_hienThiManHinhTai_fn(false);
   }
