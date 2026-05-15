@@ -252,7 +252,43 @@
       tooltip.style.top = topPos + 'px';
       tooltip.style.left = leftPos + 'px';
   }
-  
+  // thêm mới
+  // --- THÊM BIẾN TOÀN CỤC MỚI ---
+let hks_khoDuLieuTong_arr = []; 
+
+// Sửa lại hàm xử lý đăng nhập để tải dữ liệu ngay khi vào app
+function hks_xuLyPhanHoiDangNhap_fn(hks_phanHoiGG_obj) {
+    // ... [Phần giải mã giữ nguyên] ...
+    hks_hienThiManHinhTai_fn(true);
+    hks_thucThiGiaoTiep_fn('hks_khoiDongChuongTrinh_api', {hks_chuoiUyNhiem_str: hks_maDinhDanhGG_str}).then(res => {
+        if(!res.success) { /* ... xử lý lỗi giữ nguyên ... */ return; }
+        
+        hks_hoSoNguoiDungHienTai_obj = res.data;
+        sessionStorage.setItem("sys_data_hs", JSON.stringify(hks_hoSoNguoiDungHienTai_obj));
+        hks_bienKhungHeThong_obj = res.config;
+        
+        // LUỒNG MỚI: TẢI DỮ LIỆU TỔNG VÀO BỘ NHỚ ĐỆM
+        hks_capNhatBoNhoDem_fn().then(() => {
+            hks_doDuLieuVaoHopChon_fn();
+            hks_thietLapBoLoc_fn();
+            // ... [Hiển thị UI giữ nguyên] ...
+            hks_hienThiManHinhTai_fn(false);
+        });
+    });
+}
+
+// HÀM MỚI: ĐỒNG BỘ DỮ LIỆUSheets VỀ TRÌNH DUYỆT
+async function hks_capNhatBoNhoDem_fn() {
+    try {
+        let res = await hks_thucThiGiaoTiep_fn('hks_taiToanBoThucThe_api', {hks_dinhTuyenNguon_str: hks_hoSoNguoiDungHienTai_obj.reqId});
+        if(res.success) {
+            hks_khoDuLieuTong_arr = res.data;
+            console.log("Đã nạp " + hks_khoDuLieuTong_arr.length + " bản ghi vào bộ nhớ đệm.");
+        }
+    } catch(e) { console.error("Lỗi nạp đệm:", e); }
+}
+
+// [CÁC HÀM KHÁC GIỮ NGUYÊN]
   function hks_hideTooltip() {
       hks_tooltip_timer = setTimeout(() => {
           document.getElementById('global-tooltip').style.display = 'none';
