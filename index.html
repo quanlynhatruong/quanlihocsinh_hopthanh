@@ -102,21 +102,6 @@
   <div class="loader-text">ĐANG KẾT NỐI HỆ THỐNG...</div>
 </div>
 
-<div class="modal fade" id="trialModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" style="z-index: 9999999;">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center p-4 border-0 shadow-lg" style="background: rgba(255, 255, 255, 0.95);">
-      <div class="mb-4 mt-2">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" width="120">
-      </div>
-      <h5 class="fw-bold mb-3" style="font-family: 'Segoe UI', sans-serif;" id="trialTitle">Thông báo dùng thử</h5>
-      <p class="fs-5 text-secondary" style="font-family: 'Segoe UI', sans-serif;" id="trialMessage">
-        Bạn đang trong thời gian dùng thử 14 ngày. Ngày bắt đầu: 07/02/2026.
-      </p>
-      <button type="button" id="btnTrialOk" class="btn btn-primary px-5 mt-3 fw-bold" data-bs-dismiss="modal">Đồng ý</button>
-    </div>
-  </div>
-</div>
-
 <div id="gate-overlay" style="display:none;">
   <div class="gate-box">
     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="gate-logo app-logo" alt="Logo">
@@ -173,8 +158,8 @@
     </div>
 
     <ul class="nav nav-tabs mb-3" id="bangDieuKhien" role="tablist">
-      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab1" type="button" onclick="hks_khoiPhucTrangThaiGoc_fn(1)"><i class="bi bi-person-vcard"></i> 1. Thông hiện học sinh</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab2" type="button" onclick="hks_khoiPhucTrangThaiGoc_fn(2)"><i class="bi bi-journal-check"></i> 2. Kết quả học tập & Thành tích</button></li>
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab1" type="button"><i class="bi bi-person-vcard"></i> 1. Thông hiện học sinh</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab2" type="button"><i class="bi bi-journal-check"></i> 2. Kết quả học tập & Thành tích</button></li>
       <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab3" type="button"><i class="bi bi-bar-chart-line-fill"></i> 3. Thống kê - Tổng hợp</button></li>
     </ul>
 
@@ -275,16 +260,29 @@
       return JSON.parse(hks_chuoiJsonGG_str);
   }
 
-  function hks_xuLyPhanHoiDangNhap_fn(hks_phanHoiGG_obj) {
-      if (!hks_kiemTraThoiGianSuDung_fn()) return;
+  // --- HÀM MỚI (QUẢN TRỊ VIÊN): Kích hoạt quyền cho tất cả các tab ngay sau khi đăng nhập ---
+  function hks_kichHoatQuyenToanCuc_fn() {
+      let isGlobalAdmin = (hks_bienKhungHeThong_obj.hks_quyenTuyetDoi_bol === true || (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.includes('ALL')));
+      let hasAnyRights = isGlobalAdmin || (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.length > 0);
 
+      if (hasAnyRights) {
+          let btnEdit1 = document.getElementById('btnEdit1');
+          let btnEdit2 = document.getElementById('btnEdit2');
+          let btnChuyenLop = document.getElementById('btnChuyenLop');
+          
+          if(btnEdit1) btnEdit1.style.display = 'inline-block';
+          if(btnEdit2) btnEdit2.style.display = 'inline-block';
+          if(btnChuyenLop) btnChuyenLop.style.display = isGlobalAdmin ? 'inline-block' : 'none';
+      }
+  }
+
+  function hks_xuLyPhanHoiDangNhap_fn(hks_phanHoiGG_obj) {
       const hks_duLieuGiaiMaGG_obj = hks_dichChuoiXacThuc_fn(hks_phanHoiGG_obj.credential);
       const hks_khoaAccount_str = "em" + "ail"; 
       const hks_maDinhDanhGG_str = hks_duLieuGiaiMaGG_obj[hks_khoaAccount_str];
 
-      // BẢO MẬT: Lưu JWT Token chuẩn vào Session thay vì chuỗi trần
+      // Lưu Token để duy trì
       sessionStorage.setItem("sys_token_hs", hks_phanHoiGG_obj.credential);
-
       hks_hienThiManHinhTai_fn(true);
       
       hks_thucThiGiaoTiep_fn('hks_khoiDongChuongTrinh_api', {hks_chuoiUyNhiem_str: hks_phanHoiGG_obj.credential, hks_khoaBaoVe_str: ""}).then(hks_ketQuaAPI_obj => {
@@ -314,6 +312,9 @@
           hks_doDuLieuVaoHopChon_fn();
           hks_thietLapBoLoc_fn();
 
+          // SỬA ĐỔI: Kích hoạt quyền UI toàn cục ngay sau khi kết nối Server thành công
+          hks_kichHoatQuyenToanCuc_fn();
+
           document.getElementById('profile-display').innerText = hks_hoSoNguoiDungHienTai_obj.name; 
           document.getElementById('role-badge').innerText = hks_hoSoNguoiDungHienTai_obj.role === 'admin' ? 'Super Admin' : 'Giáo viên';
           document.getElementById('gate-overlay').style.display = 'none'; 
@@ -336,10 +337,6 @@
       }).catch(e => { Swal.fire("Sự cố kết nối", "Vui lòng kiểm tra lại mạng: " + e.message, "warning"); hks_hienThiManHinhTai_fn(false); });
   }
 
-  function hks_kiemTraThoiGianSuDung_fn() {
-    return true; 
-  }
-
   $(document).ready(function() {
     hks_hienThiManHinhTai_fn(true);
     $.get("Tab1.html", function(data1) {
@@ -349,14 +346,9 @@
             $.get("Tab3.html", function(data3) {
                 $("#khung-chua-tab").append(data3);
                 
-                const hks_kiemTraThuLe_bol = hks_kiemTraThoiGianSuDung_fn();
-                if (!hks_kiemTraThuLe_bol) {
-                    hks_hienThiManHinhTai_fn(false);
-                    return; 
-                }
-
                 let hks_duLieuLuuTru_str = sessionStorage.getItem("sys_data_hs");
                 let hks_token_luu_str = sessionStorage.getItem("sys_token_hs");
+                
                 if(hks_duLieuLuuTru_str && hks_token_luu_str) {
                     hks_hoSoNguoiDungHienTai_obj = JSON.parse(hks_duLieuLuuTru_str);
                     document.getElementById('gate-overlay').style.display = 'none';
@@ -388,6 +380,9 @@
                         hks_bienKhungHeThong_obj = hks_duLieuTaiVe_obj;
                         hks_doDuLieuVaoHopChon_fn(); 
                         
+                        // SỬA ĐỔI: Kích hoạt quyền UI toàn cục ngay sau khi phục hồi Session
+                        hks_kichHoatQuyenToanCuc_fn();
+                        
                         hks_hienThiManHinhTai_fn(false);
                         
                         let hks_ungDungChinh_el = document.getElementById('main-app');
@@ -403,7 +398,7 @@
         });
     }).fail(function() {
         hks_hienThiManHinhTai_fn(false);
-        Swal.fire('Lỗi tải tệp', 'Không thể nạp được các tệp giao diện (Tab1, Tab2, Tab3). Vui lòng kiểm tra lại thư mục lưu trữ trên host Github.', 'error');
+        Swal.fire('Lỗi tải tệp', 'Không thể nạp được các tệp giao diện (Tab1, Tab2, Tab3). Vui lòng kiểm tra lại cấu trúc.', 'error');
     });
   });
 
@@ -448,9 +443,18 @@
   }
 
   function hks_lamSachBangHienThi_fn(hks_chiSoThe_num) {
-      const hks_thanBang_el = document.querySelector(`#bang${hks_chiSoThe_num} tbody`); hks_thanBang_el.innerHTML = '';
-      document.getElementById(`btnEdit${hks_chiSoThe_num}`).style.display = 'none';
-      document.getElementById(`groupEdit${hks_chiSoThe_num}`).style.display = 'none';
+      const hks_thanBang_el = document.querySelector(`#bang${hks_chiSoThe_num} tbody`); 
+      if(hks_thanBang_el) hks_thanBang_el.innerHTML = '';
+      
+      let groupEdit = document.getElementById(`groupEdit${hks_chiSoThe_num}`);
+      let btnEdit = document.getElementById(`btnEdit${hks_chiSoThe_num}`);
+      if(groupEdit) groupEdit.style.display = 'none';
+      
+      // Khôi phục hiển thị nút Sửa toàn cục (thay vì ẩn đi khi tìm kiếm)
+      let isGlobalAdmin = (hks_bienKhungHeThong_obj.hks_quyenTuyetDoi_bol === true || (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.includes('ALL')));
+      let hasAnyRights = isGlobalAdmin || (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.length > 0);
+      if(btnEdit && hasAnyRights) btnEdit.style.display = 'inline-block';
+
       if(hks_chiSoThe_num === 1) hks_trangThaiSuaMot_bol = false;
       if(hks_chiSoThe_num === 2) hks_trangThaiSuaHai_bol = false;
   }
@@ -460,35 +464,12 @@
        hks_trangThaiSuaMot_bol = true;
        document.getElementById('btnEdit1').style.display = 'none';
        document.getElementById('groupEdit1').style.display = 'inline-block';
-       let hks_laQuanTriCapCao_bol = (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.includes('ALL'));
-       document.getElementById('btnChuyenLop').style.display = hks_laQuanTriCapCao_bol ? 'inline-block' : 'none';
        hks_dieuKhienOVuong_fn('#bang1', false);
     } else {
        hks_trangThaiSuaHai_bol = true;
        document.getElementById('btnEdit2').style.display = 'none';
        document.getElementById('groupEdit2').style.display = 'inline-block';
        hks_dieuKhienOVuong_fn('#bang2', false);
-    }
-  }
-
-  function hks_khoiPhucTrangThaiGoc_fn(hks_chiSoThe_num) {
-    let hks_namChon_str = document.getElementById(`t${hks_chiSoThe_num}_nam`).value;
-    let hks_lopChon_str = document.getElementById(`t${hks_chiSoThe_num}_lop`).value;
-    let hks_khoaChon_str = `${hks_namChon_str}_${hks_lopChon_str}`;
-    let hks_laQuanTriCapCao_bol = (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.includes('ALL'));
-    let hks_coQuyenSua_bol = hks_laQuanTriCapCao_bol || (hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr && hks_bienKhungHeThong_obj.hks_tapQuyenSuDung_arr.includes(hks_khoaChon_str));
-    let hks_nutSuaUI_el = document.getElementById(`btnEdit${hks_chiSoThe_num}`);
-
-    if(hks_chiSoThe_num === 1) {
-       hks_trangThaiSuaMot_bol = false;
-       hks_nutSuaUI_el.style.display = hks_coQuyenSua_bol ? 'inline-block' : 'none'; 
-       document.getElementById('groupEdit1').style.display = 'none';
-       hks_dieuKhienOVuong_fn('#bang1', true);
-    } else if(hks_chiSoThe_num === 2) {
-       hks_trangThaiSuaHai_bol = false;
-       hks_nutSuaUI_el.style.display = hks_coQuyenSua_bol ? 'inline-block' : 'none'; 
-       document.getElementById('groupEdit2').style.display = 'none';
-       hks_dieuKhienOVuong_fn('#bang2', true);
     }
   }
 
